@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rich Editor MVP – Native Browser Single‑File</title>
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    /* Minimal, function-first styles */
+    :root { --gap: .75rem; --pad: .75rem; --border: 1px solid color-mix(in oklab, CanvasText 20%, transparent); --accent: Highlight; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    header, main, aside, footer { padding: var(--pad); }
+    header { position: sticky; top: 0; background: color-mix(in oklab, Canvas 95%, CanvasText 0%); border-bottom: var(--border); z-index: 5; }
+    .app { display: grid; grid-template-columns: 1fr 320px; gap: var(--gap); }
+    @media (max-width: 1000px){ .app { grid-template-columns: 1fr; } aside { order: -1; } }
+    section.landmark { border: var(--border); border-radius: 10px; padding: var(--pad); min-height: 120px; }
+    section.landmark h2 { margin: 0 0 .5rem 0; font-size: 14px; opacity: .7; display: flex; gap: .5rem; align-items: center; }
+    .items { display: grid; gap: .5rem; }
+    .item { border: var(--border); border-radius: 10px; padding: .5rem .5rem .5rem .25rem; display: grid; grid-template-columns: 28px 1fr auto; gap: .5rem; background: color-mix(in oklab, Canvas 98%, CanvasText 0%); }
+    .item[aria-grabbed="true"] { outline: 2px dashed var(--accent); outline-offset: 2px; }
+    .handle { cursor: grab; user-select: none; display: grid; place-items: center; }
+    .handle:active { cursor: grabbing; }
+    .content[contenteditable="true"] { outline: 2px solid color-mix(in oklab, Highlight 60%, Canvas); border-radius: 6px; padding: .25rem; background: color-mix(in oklab, Canvas 97%, CanvasText 0%); }
+    .actions { display: flex; gap: .25rem; align-items: center; }
+    button.icon { background: none; border: var(--border); border-radius: 8px; padding: .25rem .4rem; }
+    .drop-hint { border: 2px dashed color-mix(in oklab, CanvasText 30%, transparent); border-radius: 10px; padding: .5rem; text-align: center; opacity: .8; }
+    .dropping { background: color-mix(in oklab, Highlight 12%, Canvas); }
+    .toolbar { display: flex; gap: .5rem; align-items: center; }
+    .status { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; background: color-mix(in oklab, Canvas 96%, CanvasText 0%); border: var(--border); border-radius: 8px; padding: .5rem; max-height: 180px; overflow:auto; }
+    .timeline { display: grid; gap: .25rem; }
+    .op { border: var(--border); border-radius: 8px; padding: .4rem; background: color-mix(in oklab, Canvas 98%, CanvasText 0%); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .op.reverted { opacity: .55; text-decoration: line-through; }
+    .pill { font-size: 12px; padding: 0 .35rem; border: var(--border); border-radius: 999px; }
+    dialog { border-radius: 10px; border: var(--border); }
+    .kbd { border: var(--border); border-bottom-width: 3px; border-radius: 6px; padding: 0 .25rem; font-family: ui-monospace, monospace; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="toolbar">
+      <strong>Rich Editor MVP</strong>
+      <span class="pill" id="sync-pill" title="local-first, ready">local-first</span>
+      <button id="add-anywhere">Add item…</button>
+      <button id="undo-btn" disabled>Undo</button>
+      <button id="redo-btn" disabled>Redo</button>
+      <button id="export-btn" title="Export JSON">Export</button>
+      <button id="import-btn" title="Import JSON">Import</button>
+      <button id="clear-btn" title="Clear all data">Reset</button>
+      <span style="margin-left:auto"></span>
+      <small>Tips: drag by ☰ · edit with double‑click · <span class="kbd">Enter</span> = new line, <span class="kbd">Esc</span> = cancel, <span class="kbd">Ctrl/Cmd+Enter</span> = save</small>
+    </div>
+  </header>
+
+  <div class="app">
+    <main>
+      <section class="landmark" data-section="header" aria-label="Header">
+        <h2>Header <button class="icon add" aria-label="Add header item">＋</button></h2>
+        <div class="items" role="list"></div>
+        <div class="drop-hint">Drop items here</div>
+      </section>
+      <section class="landmark" data-section="main" aria-label="Main">
+        <h2>Main <button class="icon add" aria-label="Add main item">＋</button></h2>
+        <div class="items" role="list"></div>
+        <div class="drop-hint">Drop items here</div>
+      </section>
+      <section class="landmark" data-section="aside" aria-label="Aside">
+        <h2>Aside <button class="icon add" aria-label="Add aside item">＋</button></h2>
+        <div class="items" role="list"></div>
+        <div class="drop-hint">Drop items here</div>
+      </section>
+      <section class="landmark" data-section="footer" aria-label="Footer">
+        <h2>Footer <button class="icon add" aria-label="Add footer item">＋</button></h2>
+        <div class="items" role="list"></div>
+        <div class="drop-hint">Drop items here</div>
+      </section>
+    </main>
+
+    <aside>
+      <h3>Revision Timeline</h3>
+      <div class="timeline" id="timeline"></div>
+      <div class="toolbar" style="margin-top:.5rem">
+        <button id="undo-last">Undo last</button>
+        <button id="redo-last">Redo last</button>
+      </div>
+      <h3>State</h3>
+      <pre class="status" id="state-out" aria-live="polite"></pre>
+      <h3>Notes</h3>
+      <ul>
+        <li>All edits are operations appended to an event log in IndexedDB.</li>
+        <li>State is derived by reducing ops (event‑sourced). Undo pushes a compensating op.</li>
+        <li>Service Worker caches the app shell for offline <em>(requires a separate <code>sw.js</code> file served over http(s) or localhost)</em>.</li>
+      </ul>
+    </aside>
+  </div>
+
+  <footer>
+    <small>Single‑file demo. For full POC: swap local reducer with nanostores + websocket sync.</small>
+  </footer>
+
+  <template id="item-template">
+    <div class="item" draggable="true" role="listitem">
+      <div class="handle" title="Drag">☰</div>
+      <div class="content" contenteditable="false" spellcheck="true"></div>
+      <div class="actions">
+        <button class="icon edit" title="Edit">✎</button>
+        <button class="icon dup" title="Duplicate">⧉</button>
+        <button class="icon del" title="Delete">🗑</button>
+      </div>
+    </div>
+  </template>
+
+<script>
+(function(){
+  const $ = (s, el=document) => el.querySelector(s);
+  const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
+
+  // ---------- Data model (event-sourced) ----------
+  // Document is partitioned into sections: header/main/aside/footer.
+  // Items are simple rich-text blocks (HTML contenteditable fragments).
+  // Every change is an op appended to the log with an inverse to enable undo.
+  // op = { id, ts, type, payload, inverseOf? } // inverseOf links compensating ops for redo/undo
+
+  const DB_NAME = 'rich-editor-mvp';
+  const STORE_OPS = 'ops';
+  let idb;
+
+  const uuid = () => crypto.randomUUID();
+
+  let inMemoryOps = []; // cached ops (ordered)
+  let derivedState = emptyState();
+  let undoStack = []; // array of op.id (applied forward ops)
+  let redoStack = []; // array of op.id that were undone
+
+  function emptyState(){
+    return { sections: { header: [], main: [], aside: [], footer: [] }, items: {} };
+  }
+
+  function clone(x){ return structuredClone(x); }
+
+  // Reducer applies an op to state, returns new state
+  const reducers = {
+    add_item(state, {section, item, toIndex}){
+      const s = clone(state);
+      s.items[item.id] = item; // {id, html}
+      const items = s.sections[section];
+      items.splice(toIndex == null ? items.length : toIndex, 0, item.id);
+      return s;
+    },
+    update_item(state, {id, html}){
+      const s = clone(state);
+      if (s.items[id]) s.items[id].html = html; // no-op if missing
+      return s;
+    },
+    remove_item(state, {section, id}){
+      const s = clone(state);
+      delete s.items[id];
+      s.sections[section] = s.sections[section].filter(x => x !== id);
+      return s;
+    },
+    move_item(state, {fromSection, toSection, id, toIndex}){
+      const s = clone(state);
+      s.sections[fromSection] = s.sections[fromSection].filter(x => x !== id);
+      const arr = s.sections[toSection];
+      const idx = (toIndex==null? arr.length : Math.max(0, Math.min(arr.length, toIndex)));
+      arr.splice(idx, 0, id);
+      return s;
+    }
+  };
+
+  function applyOp(state, op){
+    const r = reducers[op.type];
+    if (!r) return state; // unknown op type
+    return r(state, op.payload);
+  }
+
+  function reduceAll(ops){
+    return ops.reduce((s,op)=>applyOp(s,op), emptyState());
+  }
+
+  // Build inverse ops for undo (compensating transactions)
+  const inverses = {
+    add_item(op, stateBefore){
+      const { section, item } = op.payload;
+      return { type: 'remove_item', payload: { section, id: item.id } };
+    },
+    update_item(op, stateBefore){
+      const { id } = op.payload;
+      const prevHtml = stateBefore.items[id]?.html ?? '';
+      return { type: 'update_item', payload: { id, html: prevHtml } };
+    },
+    remove_item(op, stateBefore){
+      const { section, id } = op.payload;
+      const item = stateBefore.items[id];
+      if (!item) return null; // cannot invert
+      return { type: 'add_item', payload: { section, item: clone(item), toIndex: stateBefore.sections[section].indexOf(id) } };
+    },
+    move_item(op, stateBefore){
+      const { fromSection, toSection, id, toIndex } = op.payload;
+      const fromIdx = stateBefore.sections[fromSection].indexOf(id);
+      return { type: 'move_item', payload: { fromSection: toSection, toSection: fromSection, id, toIndex: fromIdx } };
+    }
+  };
+
+  // ---------- IndexedDB ----------
+  async function dbOpen(){
+    if (idb) return idb;
+    idb = await new Promise((res, rej) => {
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        db.createObjectStore(STORE_OPS, { keyPath: 'id' });
+        // simple index by timestamp
+        db.createObjectStore('meta');
+      };
+      req.onsuccess = () => res(req.result);
+      req.onerror = () => rej(req.error);
+    });
+    return idb;
+  }
+
+  async function opsAdd(op){
+    const db = await dbOpen();
+    await tx(db, STORE_OPS, 'readwrite', store => store.put(op));
+  }
+  async function opsAll(){
+    const db = await dbOpen();
+    const all = [];
+    await tx(db, STORE_OPS, 'readonly', store => store.openCursor().onsuccess = e => {
+      const cur = e.target.result; if (!cur) return; all.push(cur.value); cur.continue();
+    });
+    // sort by ts asc if needed
+    all.sort((a,b)=>a.ts.localeCompare(b.ts));
+    return all;
+  }
+  async function opsClear(){
+    const db = await dbOpen();
+    await tx(db, STORE_OPS, 'readwrite', store => store.clear());
+  }
+  function tx(db, store, mode, fn){
+    return new Promise((res, rej) => {
+      const t = db.transaction(store, mode); const s = t.objectStore(store);
+      const ret = fn(s);
+      t.oncomplete = () => res(ret);
+      t.onerror = () => rej(t.error);
+    });
+  }
+
+  // ---------- Service Worker (offline cache) ----------
+  (async function registerSW(){
+    if (!('serviceWorker' in navigator)) return;
+    try {
+      const reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+      await navigator.serviceWorker.ready;
+      $('#sync-pill').textContent = 'offline-ready';
+      console.log('SW registered', reg);
+    } catch (e){ console.warn('SW register failed', e); }
+  })();
+
+  // ---------- UI helpers ----------
+  function render(){
+    // Render items in each section
+    ['header','main','aside','footer'].forEach(sec => {
+      const container = $(`section.landmark[data-section="${sec}"] .items`);
+      container.innerHTML = '';
+      derivedState.sections[sec].forEach((id, index) => {
+        const item = derivedState.items[id];
+        const el = makeItemEl(item, sec, index);
+        container.appendChild(el);
+      });
+    });
+    renderTimeline();
+    $('#undo-btn').disabled = undoStack.length === 0;
+    $('#redo-btn').disabled = redoStack.length === 0;
+    $('#undo-last').disabled = undoStack.length === 0;
+    $('#redo-last').disabled = redoStack.length === 0;
+    $('#state-out').textContent = JSON.stringify(derivedState, null, 2);
+  }
+
+  function makeItemEl(item, section, index){
+    const tpl = $('#item-template');
+    const node = tpl.content.firstElementChild.cloneNode(true);
+    node.dataset.id = item.id;
+    node.dataset.section = section;
+    node.querySelector('.content').innerHTML = safeHTML(item.html || '');
+
+    // Editing
+    node.querySelector('.edit').addEventListener('click', () => startEdit(node));
+    node.querySelector('.content').addEventListener('dblclick', () => startEdit(node));
+
+    // Delete
+    node.querySelector('.del').addEventListener('click', () => removeItem(section, item.id));
+    // Duplicate
+    node.querySelector('.dup').addEventListener('click', () => duplicateItem(section, item.id));
+
+    // Drag & drop
+    node.addEventListener('dragstart', e => {
+      node.setAttribute('aria-grabbed', 'true');
+      e.dataTransfer.setData('text/plain', JSON.stringify({ id: item.id, fromSection: section, fromIndex: index }));
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    node.addEventListener('dragend', () => node.removeAttribute('aria-grabbed'));
+
+    return node;
+  }
+
+  function wireDropZones(){
+    $$('.landmark').forEach(secEl => {
+      const itemsEl = $('.items', secEl);
+      ['dragenter','dragover'].forEach(type => itemsEl.addEventListener(type, e => { e.preventDefault(); secEl.classList.add('dropping'); }));
+      ['dragleave','drop'].forEach(type => itemsEl.addEventListener(type, e => { e.preventDefault(); if(type==='drop') onDrop(secEl, e); secEl.classList.remove('dropping'); }));
+      // Click to create
+      $('.add', secEl).addEventListener('click', () => addNew(secEl.dataset.section));
+      secEl.addEventListener('click', e => { if (e.target === secEl || e.target.classList.contains('items')) addNew(secEl.dataset.section); });
+    });
+  }
+
+  function onDrop(secEl, e){
+    try {
+      const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+      const toSection = secEl.dataset.section;
+      const toIndex = findDropIndex(e, secEl);
+      if (data.fromSection === toSection && toIndex != null){
+        // reorder within same section
+        moveItem(data.fromSection, toSection, data.id, toIndex);
+      } else {
+        moveItem(data.fromSection, toSection, data.id, toIndex);
+      }
+    } catch(err){ console.warn(err); }
+  }
+
+  function findDropIndex(e, secEl){
+    const rect = $('.items', secEl).getBoundingClientRect();
+    const children = $$('.items > .item', secEl);
+    let y = e.clientY;
+    for (let i=0;i<children.length;i++){
+      const r = children[i].getBoundingClientRect();
+      if (y < (r.top + r.height/2)) return i;
+    }
+    return children.length; // append
+  }
+
+  // ---------- Commands (create/update/delete/move) ----------
+  async function commit(op, recordHistory=true){
+    // Link inverse (for redo), compute inverse against CURRENT state
+    const inverse = inverses[op.type]?.(op, derivedState);
+    // Unique, increasing timestamps preserve operation order after an IndexedDB reload.
+    const ts = new Date(Math.max(Date.now(), (Date.parse(inMemoryOps.at(-1)?.ts) || 0) + 1)).toISOString();
+    const full = { id: uuid(), ts, ...op, inverse: inverse||null };
+    await opsAdd(full);
+    inMemoryOps.push(full);
+    derivedState = applyOp(derivedState, full);
+    if (recordHistory) { undoStack.push(full.id); redoStack = []; }
+    render();
+    await notifyPeers();
+    return full;
+  }
+
+  async function addNew(section){
+    const id = uuid();
+    const item = { id, html: '<p>New item. Double‑click to edit.</p>' };
+    await commit({ type: 'add_item', payload: { section, item } });
+  }
+
+  async function removeItem(section, id){
+    await commit({ type: 'remove_item', payload: { section, id } });
+  }
+
+  async function duplicateItem(section, id){
+    const src = derivedState.items[id];
+    if (!src) return;
+    const copy = { id: uuid(), html: src.html };
+    await commit({ type: 'add_item', payload: { section, item: copy } });
+  }
+
+  async function moveItem(fromSection, toSection, id, toIndex){
+    if (!derivedState.items[id]) return;
+    await commit({ type: 'move_item', payload: { fromSection, toSection, id, toIndex } });
+  }
+
+  function startEdit(node){
+    const content = $('.content', node);
+    const id = node.dataset.id; const section = node.dataset.section;
+    content.setAttribute('contenteditable', 'true'); content.focus();
+    const sel = window.getSelection(); sel?.selectAllChildren(content); sel?.collapseToEnd();
+
+    function finish(cancel){
+      content.removeEventListener('keydown', onKey);
+      content.removeEventListener('blur', onBlur);
+      content.setAttribute('contenteditable', 'false');
+      if (!cancel){ const html = safeHTML(content.innerHTML); commit({ type: 'update_item', payload: { id, html } }); }
+      else { content.innerHTML = safeHTML(derivedState.items[id].html); }
+    }
+    function onKey(e){
+      if (e.key === 'Escape') { e.preventDefault(); finish(true); }
+      if ((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==='enter'){ e.preventDefault(); finish(false); }
+    }
+    function onBlur(){ finish(false); }
+    content.addEventListener('keydown', onKey);
+    content.addEventListener('blur', onBlur);
+  }
+
+  // ---------- Undo / Redo (compensating ops) ----------
+  async function undo(){
+    const lastId = undoStack.pop(); if (!lastId) return;
+    const op = inMemoryOps.find(o=>o.id===lastId);
+    if (!op || !op.inverse) return;
+    const inv = { type: op.inverse.type, payload: op.inverse.payload, inverseOf: op.id };
+    redoStack.push(op.id);
+    await commit(inv, false);
+  }
+  async function redo(){
+    const id = redoStack.pop(); if (!id) return;
+    const op = inMemoryOps.find(o=>o.id===id);
+    if (!op) return;
+    // re-apply original op as a new op (to keep timeline immutable)
+    undoStack.push(id);
+    await commit({ type: op.type, payload: op.payload, inverseOf: id }, false);
+  }
+
+  // ---------- Import / Export / Reset ----------
+  function download(filename, data){
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([data], {type:'application/json'}));
+    a.download = filename; a.click(); URL.revokeObjectURL(a.href);
+  }
+
+  $('#export-btn').addEventListener('click', () => {
+    const dump = JSON.stringify({ ops: inMemoryOps }, null, 2);
+    download('report-export.json', dump);
+  });
+
+  $('#import-btn').addEventListener('click', async () => {
+    const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json';
+    inp.onchange = async () => {
+      const file = inp.files[0]; if (!file) return;
+      try {
+        const data = JSON.parse(await file.text());
+        validateOps(data.ops);
+        const state = reduceAll(data.ops);
+        // Replace in one transaction so a failed import preserves the existing document.
+        const db = await dbOpen();
+        await tx(db, STORE_OPS, 'readwrite', store => {
+          store.clear();
+          for (const op of data.ops) store.put(op);
+        });
+        inMemoryOps = data.ops; derivedState = state; undoStack = []; redoStack = [];
+        render(); await notifyPeers();
+      } catch (e) { alert('Import failed: ' + e.message); }
+    };
+    inp.click();
+  });
+
+  $('#clear-btn').addEventListener('click', async () => {
+    if (!confirm('Clear all data?')) return;
+    await opsClear(); inMemoryOps = []; derivedState = emptyState(); undoStack = []; redoStack = [];
+    render();
+  });
+
+  // ---------- Timeline rendering ----------
+  function renderTimeline(){
+    const t = $('#timeline'); t.innerHTML='';
+    inMemoryOps.forEach((op, i) => {
+      const div = document.createElement('div');
+      div.className = 'op';
+      div.innerHTML = `<strong>${escapeHTML(op.type)}</strong> <small>${escapeHTML(op.ts)}</small>` + (op.inverseOf? ` <span class="pill">inverse of ${escapeHTML(op.inverseOf.slice(0,8))}</span>`:'') +
+        `<div><details><summary>payload</summary><pre>${escapeHTML(JSON.stringify(op.payload, null, 2))}</pre></details></div>`;
+      t.prepend(div); // newest on top
+    });
+  }
+
+  function escapeHTML(s){ return s.replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+
+  // Rebuild basic rich text from inert markup; copy no attributes or active content.
+  function safeHTML(html){
+    const input = document.createElement('template'); input.innerHTML = html;
+    const output = document.createElement('div');
+    const allowed = new Set(['P','BR','DIV','SPAN','B','STRONG','I','EM','U','S','SMALL','H1','H2','H3','H4','H5','H6','UL','OL','LI','BLOCKQUOTE','PRE','CODE']);
+    function copy(source, target){
+      for (const node of source.childNodes){
+        if (node.nodeType === Node.TEXT_NODE) target.append(document.createTextNode(node.textContent));
+        else if (node.nodeType === Node.ELEMENT_NODE && allowed.has(node.tagName) && node.namespaceURI === 'http://www.w3.org/1999/xhtml'){
+          const el = document.createElement(node.localName); copy(node, el); target.append(el);
+        }
+      }
+    }
+    copy(input.content, output); return output.innerHTML;
+  }
+
+  function validateOps(ops){
+    if (!Array.isArray(ops)) throw new Error('Expected an operation log.');
+    const ids = new Set(), sections = ['header','main','aside','footer'];
+    const validId = id => typeof id === 'string' && /^[a-zA-Z0-9-]{1,100}$/.test(id) && !['constructor','prototype'].includes(id);
+    let previous = '';
+    let state = emptyState();
+    for (const op of ops){
+      if (!op || !validId(op.id) || ids.has(op.id) || typeof op.ts !== 'string' || !Number.isFinite(Date.parse(op.ts)) || new Date(op.ts).toISOString() !== op.ts || op.ts < previous) throw new Error('Invalid operation ID or order.');
+      ids.add(op.id); previous = op.ts;
+      if (!Object.hasOwn(reducers, op.type) || !op.payload || typeof op.payload !== 'object') throw new Error('Invalid operation.');
+      const p = op.payload;
+      if (op.inverseOf != null && !validId(op.inverseOf)) throw new Error('Invalid inverse ID.');
+      if (op.type === 'move_item') {
+        if (!sections.includes(p.fromSection) || !sections.includes(p.toSection)) throw new Error('Invalid move.');
+      } else if (op.type !== 'update_item' && !sections.includes(p.section)) throw new Error('Invalid section.');
+      if (op.type === 'add_item') {
+        if (!p.item || !validId(p.item.id) || typeof p.item.html !== 'string') throw new Error('Invalid item.');
+        p.item.html = safeHTML(p.item.html);
+      } else if (!validId(p.id)) throw new Error('Invalid item ID.');
+      if (op.type === 'update_item') {
+        if (typeof p.html !== 'string') throw new Error('Invalid content.');
+        p.html = safeHTML(p.html);
+      }
+      if (p.toIndex != null && (!Number.isInteger(p.toIndex) || p.toIndex < 0)) throw new Error('Invalid position.');
+      state = applyOp(state, op);
+      const itemIds = Object.values(state.sections).flat();
+      if (new Set(itemIds).size !== itemIds.length || itemIds.length !== Object.keys(state.items).length || itemIds.some(id => !Object.hasOwn(state.items, id))) throw new Error('Inconsistent item references.');
+    }
+  }
+
+  // ---------- Global toolbar ----------
+  $('#add-anywhere').addEventListener('click', () => {
+    const sec = prompt('Add item to which section? header | main | aside | footer','main');
+    if (!sec || !(sec in derivedState.sections)) return;
+    addNew(sec);
+  });
+  $('#undo-btn').addEventListener('click', undo);
+  $('#redo-btn').addEventListener('click', redo);
+  $('#undo-last').addEventListener('click', undo);
+  $('#redo-last').addEventListener('click', redo);
+
+  // ---------- Boot ----------
+  (async function init(){
+    await dbOpen();
+    inMemoryOps = await opsAll();
+    derivedState = reduceAll(inMemoryOps);
+    wireDropZones();
+    if (inMemoryOps.length === 0){
+      // seed some content
+      await commit({ type: 'add_item', payload: { section: 'header', item: { id: uuid(), html: '<h1>Quarterly Report</h1>' } } });
+      await commit({ type: 'add_item', payload: { section: 'main', item: { id: uuid(), html: '<p>Double‑click to edit me. Drag items between sections.</p>' } } });
+      await commit({ type: 'add_item', payload: { section: 'aside', item: { id: uuid(), html: '<ul><li>Task A</li><li>Task B</li></ul>' } } });
+      await commit({ type: 'add_item', payload: { section: 'footer', item: { id: uuid(), html: '<small>Confidential</small>' } } });
+    } else {
+      render();
+    }
+  })();
+
+  // ---------- Future hooks (nanostores / sync) ----------
+  // The event log is append-only. For multi-tab sync, you could:
+  // - Listen to IDB change via periodic polling (or BroadcastChannel) and re-read opsAll().
+  // - Maintain last seen op ts in localStorage; on visibilitychange, refresh.
+  // - For multi-user, stream ops over WebSocket and merge by ts/uuid (or use CRDT like Yjs in place of simple ops).
+
+  // Bonus: BroadcastChannel for multi-tab live updates (local only)
+  const bc = ('BroadcastChannel' in self) ? new BroadcastChannel('rich-editor-mvp') : null;
+  bc?.addEventListener('message', async (e) => {
+    if (e.data === 'refresh'){ inMemoryOps = await opsAll(); derivedState = reduceAll(inMemoryOps); render(); }
+  });
+  async function notifyPeers(){ bc?.postMessage('refresh'); }
+
+})();
+</script>
+</body>
+</html>
