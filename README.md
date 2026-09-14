@@ -1,12 +1,24 @@
 # one.html
 
-**One HTML file. Every web feature I can fit into it.**
+**A living web-platform reference, in one HTML file.**
+
+![one.html in light mode: a numbered section index, capability search, and live Modern CSS examples beside their source.](docs/screenshot.jpg)
+
+*The Modern CSS section, running in a browser. The examples and detection results are live.*
 
 This started as a long-running kitchen sink for the web platform: HTML, CSS, JavaScript, browser APIs, hardware access, storage, graphics, AI, accessibility, and whatever comes next.
 
 More recently, I’ve found it useful as a compact, working body of examples that constrains coding agents toward modern, browser-native solutions instead of generic framework-shaped answers.
 
 It’s not intended to be a framework, component library, or canonical implementation. It’s a maintained reference: working examples of what the platform itself can do right now.
+
+## Browse the reference
+
+- Use the numbered index to jump between sections. On smaller screens, open **Browse sections**.
+- Search for a capability such as `dialog`, `clipboard`, or `storage`. Press `/` to focus search and `Escape` to clear it. Choosing a section restores the full collection.
+- Try the live controls. The `:has()` and container-query examples show CSS excerpts read from this file’s stylesheet, with implementation notes underneath.
+- Share a section’s URL, or use the `#` permalinks beside the two CSS examples above.
+- Open **Browser details** for detection results and **Console** for messages from the examples. The **Light / Dark** control changes the page’s color scheme.
 
 ## Run it
 
@@ -22,7 +34,7 @@ Storage examples read and modify this origin’s browser storage. Use a dedicate
 
 ## What lives here
 
-- [`index.html`](index.html): the main reference, with inline styles, scripts, generated media, and feature detection. Use its section links to share individual examples.
+- [`index.html`](index.html): the main reference, with inline styles, scripts, generated media, search, and feature detection.
 - [`sw.js`](sw.js): the opt-in offline demo. Service workers require a separate served resource.
 - [`editor/`](editor/index.html): a report-editing spike derived from the reference, with its own service worker. It demonstrates local editing and an operation log; it is not a production editor or multi-user sync system. [`report-editor.html`](report-editor.html) forwards to it.
 - [`AGENTS.md`](AGENTS.md): guidance for working on this repository.
@@ -37,3 +49,5 @@ The `browser-native-spike` skill can be copied as a folder into your agent’s s
 ## Keep it small
 
 Add useful examples, fix incorrect ones, and document meaningful limitations. Keep native HTML, CSS, and JavaScript inspectable; preserve older examples unless they are wrong. Supporting files are fine where the platform needs them. Let real experiments drive organization rather than designing a taxonomy in advance.
+
+The notebook layout uses system fonts, plain text, and native controls. Keep its navigation useful as the collection grows. [`docs/screenshot.jpg`](docs/screenshot.jpg) is a documentation asset; update it when the page’s appearance changes.

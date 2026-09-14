@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Web Platform Kitchen Sink – Elements & APIs</title>
+  <title>one.html — a living web-platform reference</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <base href="./" />
   <meta name="color-scheme" content="light dark" />
@@ -10,7 +10,7 @@
   <meta name="description" content="A single-file tour of HTML elements, CSS features and Web APIs with live feature detection." />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23ff6a00'/%3E%3Ctext x='32' y='40' text-anchor='middle' font-size='32' fill='white'%3E⚙️%3C/text%3E%3C/svg%3E" />
   <style>
-    @layer base, layout, components, demos;
+    @layer base, layout, components, demos, notebook;
 
     /* Registered custom properties (Houdini @property) — animatable, typed */
     @property --hue { syntax: '<number>'; inherits: true; initial-value: 45; }
@@ -21,9 +21,9 @@
         color-scheme: light dark;
         --pad: 1rem; --gap: 0.75rem; --radius: 10px;
         /* light-dark() tokens: one declaration, both schemes */
-        --bg: light-dark(#ffffff, #111418);
-        --surface: light-dark(#fafafa, #1a1e24);
-        --surface-2: light-dark(#f0f0f2, #232830);
+        --bg: light-dark(#f8f7f3, #171918);
+        --surface: light-dark(#f3f2ee, #1e211f);
+        --surface-2: light-dark(#efeee9, #272b28);
         --text: light-dark(#1b1b1f, #e7e9ec);
         --muted: light-dark(#5f6368, #9aa0a6);
         --line: light-dark(#d5d7db, #3a4049);
@@ -86,8 +86,8 @@
       section section { background: var(--bg); }
       section:target { border-color: var(--accent); }
       fieldset { margin-bottom: var(--gap); border: var(--border); border-radius: 8px; }
-      .grid { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-      .grid.wide { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+      .grid { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); }
+      .grid.wide { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
       .row { display: flex; flex-wrap: wrap; gap: var(--gap); align-items: center; }
       .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
       .badge { font-size: 12px; padding: 0.1rem 0.4rem; border: var(--border); border-radius: 999px; white-space: nowrap; }
@@ -221,20 +221,130 @@
       .support-group summary { font-weight: 600; }
       .support-group ul { list-style: none; padding: 0; margin: 0.25rem 0 0.5rem; font-size: 12px; line-height: 1.6; }
     }
+
+    /* The reference's notebook shell. Demo rules above remain independently inspectable. */
+    @layer notebook {
+      :root { scroll-behavior: auto; --rail: 300px; --ink: light-dark(#b9470c, #ff985d); --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      body { height: auto; min-height: 100%; }
+      .skip-link { position: fixed; top: -5rem; left: 1rem; z-index: 30; padding: .75rem; background: var(--bg); }
+      .skip-link:focus { top: .5rem; }
+      #reference-index { box-sizing: border-box; position: fixed; inset: 0 auto 0 0; width: var(--rail); padding: 30px 22px 20px; border: 0; border-right: var(--border); background: var(--bg); display: flex; flex-direction: column; z-index: 12; }
+      .wordmark { color: var(--text); text-decoration: none; font: 700 40px/1.2 var(--mono); letter-spacing: -2px; }
+      .wordmark span { color: var(--ink); }
+      #reference-index h1 { margin: 0; }
+      .index-caption { margin: .7rem 0 2rem; color: var(--muted); font: 11px/1.6 var(--mono); }
+      .capability-search label { display: block; font: 12px var(--mono); margin-bottom: .6rem; }
+      .search-field { position: relative; }
+      #capability-query { box-sizing: border-box; width: 100%; min-width: 0; padding: 10px 32px 10px 10px; border: var(--border); border-radius: 3px; background: var(--bg); font: 12px var(--mono); }
+      #capability-query:not(:placeholder-shown) + kbd { display: none; }
+      .search-field kbd { position: absolute; right: 10px; top: 8px; color: var(--muted); pointer-events: none; }
+      #search-status { min-height: 1.5em; margin: .5rem 0; font: 11px/1.5 var(--mono); color: var(--muted); }
+      #section-index { flex: 1; min-height: 0; overflow: auto; }
+      #section-index > summary { display: none; }
+      #section-index nav { display: flex; flex-direction: column; flex-wrap: nowrap; gap: 1px; padding: 0; counter-reset: category; }
+      #section-index nav a { counter-increment: category; display: flex; align-items: baseline; gap: 13px; padding: 5px 8px; border: 0; border-left: 2px solid transparent; border-radius: 0; background: none; font: 14px/1.5 var(--mono); }
+      #section-index nav a::before { content: counter(category, decimal-leading-zero); color: var(--muted); font-size: 10px; }
+      #section-index nav a:hover { background: var(--surface-2); }
+      #section-index nav a[aria-current] { border-color: var(--ink); background: var(--surface-2); font-weight: 700; }
+      .index-footer { padding-top: 16px; display: grid; gap: 10px; font: 12px var(--mono); }
+      .index-footer a { color: var(--muted); text-decoration: none; }
+      .index-footer a:hover { text-decoration: underline; }
+      main { display: block; margin-left: var(--rail); padding: 0 36px 60px; container: page / inline-size; }
+      #field-toolbar { position: sticky; top: 0; z-index: 8; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 18px 0; background: var(--bg); font: 12px var(--mono); color: var(--muted); }
+      #theme-toggle { padding: 6px 10px; border-radius: 3px; font: 12px var(--mono); }
+      article > section { position: relative; padding: 0; margin-bottom: 64px; border: 0; border-radius: 0; background: none; scroll-margin-top: 70px; }
+      .section-heading { padding: 0 0 26px 156px; margin-bottom: 8px; background: none; border-bottom: 2px solid var(--ink); }
+      .section-heading h2 { margin: 0; font-size: clamp(28px, 3.1vw, 44px); line-height: 1.15; letter-spacing: -1.5px; }
+      .section-heading::before { content: attr(data-number); position: absolute; left: 0; top: 0; color: var(--muted); opacity: .55; font: 88px/1 var(--mono); letter-spacing: -3px; }
+      .section-heading p { max-width: 65ch; margin: 12px 0 0; font: 15px/1.7 var(--mono); color: var(--muted); }
+      article > section > .grid > section { padding: 20px 0; border-bottom: var(--border); background: none; min-width: 0; }
+      article h3 { margin: 0 0 16px; font-size: 24px; line-height: 1.4; letter-spacing: -.45px; }
+      article h3 .badge { display: inline-block; vertical-align: middle; letter-spacing: 0; font-weight: 400; }
+      #css > .grid { display: block; }
+      #css > .grid > section { padding: 28px 0; scroll-margin-top: 76px; }
+      #css > .grid > section > p { max-width: 76ch; }
+      .sample-link { float: right; margin-left: 12px; color: var(--muted); text-decoration: none; font: 16px var(--mono); }
+      .sample-link:hover { color: var(--ink); }
+      .specimen h3 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 16px; gap: 14px; align-items: center; font-size: 28px; }
+      .specimen h3 .badge { padding-left: 20px; font-size: 13px; }
+      .specimen h3 .sample-link { margin: 0; }
+      .specimen-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 30px; align-items: start; }
+      .specimen-demo > p { margin: 0 0 18px; font: 15px/1.7 var(--mono); color: var(--muted); }
+      .specimen-source { box-sizing: border-box; max-height: 280px; overflow: auto; margin: 0; padding: 16px; border: var(--border); border-radius: 3px; background: var(--surface-2); font: 14px/1.65 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+      .specimen-notes { margin-top: 18px; font: 13px/1.6 var(--mono); color: var(--muted); }
+      .specimen-notes p { max-width: 80ch; }
+      .has-demo { padding: 18px; }
+      .has-demo p { margin-top: 0; }
+      .cq-wrap { box-sizing: border-box; }
+      [data-supports] { border: 0; padding: 0 .3rem; font: 11px/1.5 var(--mono); white-space: normal; }
+      [data-supports]::before { content: '●'; margin-right: 6px; font-size: 8px; }
+      #console-drawer { position: fixed; left: var(--rail); right: 0; bottom: 0; z-index: 10; background: var(--bg); border-top: 2px solid var(--ink); padding: 0 36px; }
+      #console-drawer > summary { padding: 12px 0; font: 12px var(--mono); cursor: pointer; }
+      #console-drawer .log { margin-bottom: 12px; max-height: min(35dvh, 280px); }
+      #console-drawer summary span { color: var(--muted); margin-left: 12px; }
+      #browser-details { width: min(620px, 85vw); max-height: 75dvh; }
+      #browser-details .dialog-heading { display: flex; gap: 1rem; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+      #browser-details h2 { margin: 0; }
+      #browser-details form { margin: 0; }
+      #no-results { margin: 40px 0; padding: 24px; border: var(--border); }
+      .search-hidden { display: none !important; }
+      body > footer { margin-left: var(--rail); padding: 0 36px 80px; max-width: 75ch; font: 12px/1.7 var(--mono); }
+      article img, article svg, article audio, article iframe, article input, article select, article textarea { max-width: 100%; box-sizing: border-box; }
+      article pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+      article .grid > * { min-width: 0; }
+      article table { display: block; max-width: 100%; overflow: auto; }
+      @media (width <= 1000px) {
+        :root { --rail: 0px; }
+        #reference-index { position: sticky; top: 0; width: auto; padding: 14px 18px 10px; border-right: 0; border-bottom: var(--border); }
+        #reference-index h1 { line-height: 1; }
+        .wordmark { font-size: 26px; letter-spacing: -1.5px; }
+        .index-caption, .search-field kbd { display: none; }
+        .capability-search { margin-top: 14px; }
+        .capability-search label { font-size: 11px; margin-bottom: 6px; }
+        #capability-query { font-size: 14px; }
+        #search-status:empty { display: none; }
+        #section-index { flex: none; overflow: visible; }
+        #section-index > summary { display: list-item; cursor: pointer; padding: 10px 0 0; font: 12px var(--mono); }
+        #section-index nav { max-height: 45dvh; overflow: auto; padding-top: 12px; }
+        #section-index nav a { padding-block: 9px; }
+        .index-footer { position: absolute; top: 24px; right: 18px; padding: 0; font-size: 11px; }
+        .index-footer a:last-child { display: none; }
+        main { padding: 0 18px 45px; }
+        #field-toolbar { position: static; padding: 14px 0; }
+        article > section, #css > .grid > section { scroll-margin-top: 200px; }
+        .section-heading { padding-left: 52px; padding-bottom: 20px; }
+        .section-heading::before { font-size: 32px; letter-spacing: -2px; }
+        .section-heading h2 { font-size: 28px; letter-spacing: -1px; }
+        .section-heading p { font-size: 12px; }
+        .specimen h3 { display: flex; flex-wrap: wrap; font-size: 22px; gap: 8px; }
+        .specimen h3 .badge { padding: 0; }
+        .specimen h3 .sample-link { margin-left: auto; }
+        .specimen h3 > span:first-child { flex-basis: 100%; }
+        .specimen-body { grid-template-columns: 1fr; gap: 18px; }
+        article h3 { font-size: 19px; }
+        #console-drawer { padding: 0 18px; }
+        #console-drawer summary span { display: none; }
+        body > footer { padding: 0 18px 70px; }
+      }
+    }
   </style>
   <noscript>
     <style> .js-only { display: none !important; } </style>
   </noscript>
 </head>
 <body>
-  <header>
+  <a class="skip-link" href="#reference-content">Skip to examples</a>
   <div id="scroll-progress" aria-hidden="true"></div>
-  <div class="header-row">
-    <h1>Web Platform Kitchen Sink <span class="badge">single-file demo</span></h1>
-    <span class="spacer"></span>
-    <span id="engine-badge" class="badge mono" title="Detected browser engine"></span>
-    <button id="theme-toggle" type="button" aria-label="Toggle color scheme" title="Toggle light/dark (uses light-dark() + View Transitions)">🌙</button>
-  </div>
+  <header id="reference-index">
+    <h1><a class="wordmark" href="#semantics">one<span>.</span>html</a></h1>
+    <p class="index-caption">a living web-platform reference</p>
+    <div class="capability-search" hidden>
+      <label for="capability-query">Find a capability</label>
+      <div class="search-field"><input id="capability-query" type="search" placeholder="Try “dialog” or “storage”" autocomplete="off" aria-controls="reference-content"><kbd>/</kbd></div>
+      <p id="search-status" role="status"></p>
+    </div>
+    <details id="section-index" open>
+      <summary>Browse sections</summary>
   <nav aria-label="Sections">
     <a href="#semantics">Semantics</a>
     <a href="#text">Text & Inline</a>
@@ -256,10 +366,14 @@
     <a href="#performance">Performance</a>
     <a href="#misc">Misc</a>
   </nav>
-</header>
+    </details>
+    <div class="index-footer"><a href="#browser-details" id="browser-details-link">Browser details ↗</a><a href="https://github.com/chriswhawkins/one.html">View on GitHub ↗</a></div>
+  </header>
 
 <main>
-  <article>
+  <div id="field-toolbar"><span id="current-section">01 / Semantics</span><button id="theme-toggle" type="button" aria-label="Toggle color scheme">Theme</button></div>
+  <div id="no-results" hidden><h2>No examples found</h2><p>Try a platform name such as CSS, clipboard, or storage.</p><button id="clear-search" type="button">Clear search</button></div>
+  <article id="reference-content" tabindex="-1">
     <!-- Semantics -->
     <section id="semantics">
       <h2>Structural & Semantic Elements</h2>
@@ -534,20 +648,20 @@
     <!-- Modern CSS -->
     <section id="css">
       <h2>Modern CSS</h2>
-      <p>Each card shows whether <em>this</em> browser supports the feature (via <code>CSS.supports()</code>). Everything degrades gracefully.</p>
+      <p>Live examples of what CSS can do. Detection reflects this browser; try each example to see how it behaves.</p>
       <div class="grid wide">
+        <section>
+          <h3><code>:has()</code> relational selector <span class="badge" data-supports="sel::has(a)"></span></h3>
+          <p>The whole box turns green when any option is checked. Checked labels become bold.</p>
+          <div class="has-demo">
+            <label><input type="checkbox"> Option A</label> <label><input type="checkbox"> Option B</label>
+          </div>
+        </section>
         <section>
           <h3>Container queries <span class="badge" data-supports="css:container-type: inline-size"></span></h3>
           <p>Drag the corner to resize; the card re-lays out at 420px of <em>its own</em> width and the title scales with <code>cqi</code> units.</p>
           <div class="cq-wrap">
             <div class="cq-card"><div class="cq-img"></div><div><h4>Container-aware card</h4><small>Layout driven by <code>@container card (width &gt; 420px)</code>.</small></div></div>
-          </div>
-        </section>
-        <section>
-          <h3><code>:has()</code> relational selector <span class="badge" data-supports="sel::has(a)"></span></h3>
-          <div class="has-demo">
-            <p>The whole box turns green when any option is checked. Checked labels become bold.</p>
-            <label><input type="checkbox"> Option A</label> <label><input type="checkbox"> Option B</label>
           </div>
         </section>
         <section>
@@ -1765,21 +1879,131 @@ test('localStorage API', async () => {
     </section>
   </article>
 
-  <aside>
-    <h3>Status Console</h3>
+  <details id="console-drawer">
+    <summary>Console <span>Messages from the examples</span></summary>
     <div id="console" class="log mono" aria-live="polite">Console messages appear here.</div>
+  </details>
+  <dialog id="browser-details" aria-labelledby="browser-details-title">
+    <div class="dialog-heading"><h2 id="browser-details-title">Browser details</h2><form method="dialog"><button>Close</button></form></div>
+    <span id="engine-badge" class="badge mono" title="Detected browser engine"></span>
     <p><strong>Tip:</strong> Run this over <code>http://localhost</code> or <code>https://</code> so camera/mic/clipboard/geolocation/notifications/service workers work.</p>
     <div style="margin-top: 1rem; padding: 0.5rem; background: var(--surface-2); border-radius: 6px;">
       <h4 style="margin:0 0 .25rem">Browser Support <span id="support-total" class="badge"></span></h4>
       <p style="margin:0 0 .5rem; font-size: 12px; color: var(--muted)">Detected in this browser. Tags are approximate cross-engine status as of 2026: <span class="tag">all</span> every major engine · <span class="tag">partial</span> missing somewhere · <span class="tag">exp</span> single-engine / flagged.</p>
       <div id="support-status" class="mono" style="font-size: 12px;"></div>
     </div>
-  </aside>
+  </dialog>
 </main>
 
 <footer>
-  <p>Made for demonstration. Many APIs require permission or user gestures. Some features vary by browser/OS — every card shows what <em>this</em> browser supports. Last refreshed September 2026.</p>
+  <p>Made for demonstration. Many APIs require permission or user gestures. Some features vary by browser/OS — feature badges show what <em>this</em> browser detects. Last refreshed September 2026.</p>
 </footer>
+
+
+<script>
+// Reference navigation: progressively enhance the ordinary, linkable document.
+(() => {
+  const root = document.querySelector('#reference-content');
+  const sections = [...root.children];
+  const links = [...document.querySelectorAll('#section-index nav a')];
+  const query = document.querySelector('#capability-query');
+  const status = document.querySelector('#search-status');
+  const index = document.querySelector('#section-index');
+  const mobile = matchMedia('(width <= 1000px)');
+  const normalize = text => text.toLowerCase().replace(/\s+/g, ' ').trim();
+  const entries = sections.map((section, i) => {
+    const heading = section.querySelector('h2');
+    const title = heading.textContent;
+    const header = document.createElement('header');
+    header.className = 'section-heading';
+    header.dataset.number = String(i + 1).padStart(2, '0');
+    const description = heading.nextElementSibling?.matches('p') ? heading.nextElementSibling : null;
+    heading.before(header); header.append(heading);
+    if (description) header.append(description);
+    const samples = [...section.querySelectorAll(':scope > .grid > section')];
+    return { section, title: normalize(title + ' ' + links[i].textContent), text: normalize(section.textContent), samples: samples.map(el => ({ el, text: normalize(el.textContent) })) };
+  });
+  // These two source panels read the actual CSS above, so the reference cannot drift.
+  const css = document.querySelector('style').textContent;
+  for (const [selector, id, end, note] of [
+    ['.cq-wrap', 'css-container-queries', '/* :has() */', 'The wrapper declares container: card / inline-size. Resize it past 420px to change the layout. The excerpt shows the responsive rule; all styles live in this file.'],
+    ['.has-demo', 'css-has', '.has-demo label:has(:checked)', 'The selector changes the parent and checked labels without a JavaScript event handler. Detection checks selector syntax; the controls demonstrate the result.']
+  ]) {
+    const demo = document.querySelector(selector), section = demo.parentElement;
+    section.id = id; section.classList.add('specimen');
+    const heading = section.querySelector('h3');
+    const link = document.createElement('a'); link.className = 'sample-link'; link.href = '#' + id; link.textContent = '#'; link.setAttribute('aria-label', 'Link to ' + heading.childNodes[0].textContent);
+    const badge = heading.querySelector('.badge');
+    const title = document.createElement('span');
+    while (heading.firstChild && heading.firstChild !== badge) title.append(heading.firstChild);
+    heading.prepend(title); heading.append(link);
+    const body = document.createElement('div'); body.className = 'specimen-body';
+    const live = document.createElement('div'); live.className = 'specimen-demo';
+    while (heading.nextSibling) live.append(heading.nextSibling);
+    const pre = document.createElement('pre'); pre.className = 'specimen-source';
+    const code = document.createElement('code');
+    const ruleStart = id === 'css-has' ? '.has-demo:has(input:checked)' : '@container card (width > 420px)';
+    code.textContent = css.slice(css.indexOf(ruleStart), css.indexOf(end)).trim().replace(/^      /gm, '').replace(/ \{ /g, ' {\n  ').replace(/; /g, ';\n  ').replace(/ \}/g, '\n}').replace(/\n\s*\n/g, '\n');
+    pre.append(code); body.append(live, pre); section.append(body);
+    const details = document.createElement('details'); details.className = 'specimen-notes';
+    const summary = document.createElement('summary'); summary.textContent = 'Implementation notes';
+    const p = document.createElement('p'); p.textContent = note; details.append(summary, p); section.append(details);
+  }
+  function filter() {
+    const terms = normalize(query.value).split(' ').filter(Boolean);
+    const matches = text => terms.every(term => text.includes(term));
+    let count = 0;
+    for (const entry of entries) {
+      const show = matches(entry.text); entry.section.classList.toggle('search-hidden', !show);
+      if (show) count++;
+      for (const sample of entry.samples) sample.el.classList.toggle('search-hidden', terms.length > 0 && !matches(entry.title) && !matches(sample.text));
+    }
+    status.textContent = terms.length ? `${count} of ${sections.length} sections match` : '';
+    document.querySelector('#no-results').hidden = count > 0;
+  }
+  function clear() { query.value = ''; filter(); }
+  query.addEventListener('input', filter);
+  query.addEventListener('keydown', e => { if (e.key === 'Escape') { clear(); query.blur(); } });
+  document.querySelector('#clear-search').addEventListener('click', () => { clear(); query.focus(); });
+  document.addEventListener('keydown', e => {
+    if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input, textarea, select, [contenteditable], [role="textbox"]')) return;
+    e.preventDefault(); query.focus();
+  });
+  function syncIndex() { index.open = !mobile.matches; }
+  syncIndex(); mobile.addEventListener('change', syncIndex);
+  function current(section) {
+    const i = sections.indexOf(section);
+    if (i < 0) return;
+    links.forEach((link, j) => { if (i === j) link.setAttribute('aria-current', 'location'); else link.removeAttribute('aria-current'); });
+    document.querySelector('#current-section').textContent = `${String(i + 1).padStart(2, '0')} / ${links[i].textContent}`;
+  }
+  document.querySelector('#reference-index').addEventListener('click', e => {
+    const link = e.target.closest('a[href^="#"]');
+    if (!link || link.id === 'browser-details-link') return;
+    clear(); if (mobile.matches) index.open = false;
+    current(document.getElementById(link.hash.slice(1)));
+  });
+  window.addEventListener('hashchange', () => {
+    const target = document.getElementById(location.hash.slice(1));
+    if (!target || !root.contains(target)) return;
+    clear(); current(target.closest('article > section'));
+    target.scrollIntoView();
+  });
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(items => {
+      for (const item of items) if (item.isIntersecting) current(item.target);
+    }, { rootMargin: '-24% 0px -60% 0px' });
+    sections.forEach(section => observer.observe(section));
+  }
+  document.querySelector('#browser-details-link').addEventListener('click', e => {
+    const dialog = document.querySelector('#browser-details');
+    if (dialog.showModal) { e.preventDefault(); dialog.showModal(); }
+  });
+  document.querySelector('.capability-search').hidden = false;
+  const initial = document.getElementById(location.hash.slice(1));
+  if (initial && root.contains(initial)) { current(initial.closest('article > section')); requestAnimationFrame(() => initial.scrollIntoView()); }
+})();
+</script>
 
 <!-- Custom element template -->
 <template id="x-card-tmpl">
@@ -4144,7 +4368,7 @@ const withVT = (fn) => document.startViewTransition ? document.startViewTransiti
 for (const el of $$('[data-supports]')) {
   const ok = supports(el.dataset.supports);
   const label = el.textContent.trim();
-  el.textContent = (ok ? '✅ ' : '⚠️ ') + (label || (ok ? 'supported' : 'not supported here'));
+  el.textContent = (label ? label + ': ' : '') + (ok ? 'detected' : 'not detected');
   el.classList.add(ok ? 'yes' : 'no');
   el.title = (ok ? 'Supported in this browser: ' : 'Not supported in this browser: ') + el.dataset.supports;
 }
@@ -4165,7 +4389,7 @@ for (const el of $$('[data-supports]')) {
   const root = document.documentElement, btn = $('#theme-toggle');
   const mq = matchMedia('(prefers-color-scheme: dark)');
   const current = () => root.dataset.theme || (mq.matches ? 'dark' : 'light');
-  const paint = () => { btn.textContent = current() === 'dark' ? '☀️' : '🌙'; };
+  const paint = () => { const next = current() === 'dark' ? 'Light' : 'Dark'; btn.textContent = next; btn.setAttribute('aria-label', `Switch to ${next.toLowerCase()} theme`); };
   const saved = localStorage.getItem('ks-theme'); if (saved) root.dataset.theme = saved;
   paint(); mq.addEventListener('change', paint);
   btn.addEventListener('click', () => withVT(() => { root.dataset.theme = current() === 'dark' ? 'light' : 'dark'; localStorage.setItem('ks-theme', root.dataset.theme); paint(); }));
