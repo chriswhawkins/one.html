@@ -72,6 +72,66 @@
       }
       main { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: var(--pad); align-items: start; container: page / inline-size; }
       aside { position: sticky; top: 0; max-height: 100dvh; overflow: auto; }
+      /* The pattern explorer is navigation around the live examples, not a second copy. */
+      #patterns { padding: 18px 0 36px; scroll-margin-top: 70px; }
+      #patterns[hidden], #pattern-focus[hidden], #pattern-empty[hidden], .pattern-card[hidden], .catalog-hidden, .focus-hidden { display: none !important; }
+      .eyebrow { font: 11px/1.6 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--ink); margin: 0 0 12px; }
+      .explorer-intro { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; padding-bottom: 28px; border-bottom: 2px solid var(--ink); }
+      #patterns-title { font-size: clamp(34px, 4vw, 56px); line-height: 1.05; letter-spacing: -2px; margin: 0 0 20px; }
+      .explorer-intro p:not(.eyebrow) { max-width: 55ch; line-height: 1.65; }
+      .skill-setup { padding: 22px; border: var(--border); background: var(--surface); }
+      .skill-setup h3 { margin: 0; font-size: 21px; letter-spacing: -.4px; }
+      .skill-setup details { margin-top: 18px; font-size: 13px; }
+      #skill-command { display: block; padding: 14px 0; overflow-wrap: anywhere; font: 12px/1.7 var(--mono); }
+      #patterns a, #pattern-focus a { color: var(--ink); text-underline-offset: 3px; }
+      #patterns button, #pattern-focus button, .example-actions button, #agent-prompt-dialog button { padding: 8px 12px; border: var(--border); border-radius: 3px; background: var(--surface); font: 12px/1.4 var(--mono); cursor: pointer; }
+      #patterns button:hover, #pattern-focus button:hover, .example-actions button:hover { border-color: var(--ink); }
+      #copy-skill-prompt, #focus-copy, #copy-preview-prompt { background: var(--text) !important; color: var(--bg); }
+      .explorer-goal { margin: 24px 0 36px; }
+      .explorer-goal label { display: block; margin-bottom: 8px; font: 12px var(--mono); }
+      .explorer-goal span { color: var(--muted); }
+      #pattern-goal { box-sizing: border-box; width: 100%; padding: 12px; border: var(--border); border-radius: 3px; background: var(--surface); }
+      .explorer-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; }
+      .explorer-heading h3 { margin: 0; font-size: 24px; letter-spacing: -.7px; }
+      #pattern-count { font: 12px var(--mono); color: var(--muted); }
+      #pattern-groups { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+      #pattern-groups button[aria-pressed="true"] { color: var(--ink); border-color: var(--ink); background: color-mix(in oklab, var(--ink) 7%, var(--bg)); }
+      #pattern-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 16px; }
+      .pattern-card { display: flex; flex-direction: column; padding: 22px; border: var(--border); border-top: 3px solid var(--ink); background: var(--surface); }
+      .pattern-card h4 { margin: 0 0 10px; font-size: 22px; letter-spacing: -.5px; }
+      .pattern-card p { line-height: 1.6; margin: 0 0 18px; }
+      .pattern-card .pattern-needs { color: var(--muted); font: 12px/1.6 var(--mono); }
+      .pattern-card .row { margin-top: auto; }
+      .pattern-card .try-pattern { font-weight: 600; margin-right: auto; }
+      .explorer-footnote { color: var(--muted); font: 12px/1.7 var(--mono); margin: 24px 0 0; max-width: 90ch; }
+      .example-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: -4px 0 18px; }
+      .example-actions button { color: var(--muted); padding: 5px 8px; font-size: 11px; }
+      #pattern-focus { padding: 12px 0 24px; margin-bottom: 24px; border-bottom: 2px solid var(--ink); }
+      #pattern-focus > .row:first-child { justify-content: space-between; margin-bottom: 24px; font: 12px var(--mono); }
+      #focus-title { margin: 0; font-size: clamp(28px, 3vw, 40px); letter-spacing: -1px; }
+      .focus-guide { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; font-size: 14px; line-height: 1.65; }
+      .focus-guide strong { color: var(--ink); font: 11px var(--mono); text-transform: uppercase; }
+      .focus-layout { display: block !important; }
+      body.pattern-focused .example-actions { display: none; }
+      body.pattern-focused article > section { margin-bottom: 24px; }
+      #agent-prompt-dialog { box-sizing: border-box; width: min(760px, 94vw); max-width: 94vw; max-height: 85dvh; overflow: auto; padding: 24px; }
+      .prompt-heading { justify-content: space-between; }
+      .prompt-heading h2 { margin: 0; font-size: 24px; }
+      #agent-prompt-dialog label { font: 12px var(--mono); }
+      #agent-prompt-text { display: block; box-sizing: border-box; width: 100%; margin: 10px 0 16px; padding: 12px; font: 12px/1.6 var(--mono); border: var(--border); background: var(--bg); resize: vertical; }
+      .copy-notice { position: fixed; right: 24px; bottom: 54px; z-index: 20; max-width: min(400px, 80vw); margin: 0; padding: 12px 16px; background: var(--text); color: var(--bg); font: 12px/1.6 var(--mono); border-radius: 3px; pointer-events: none; }
+      .copy-notice:empty { display: none; }
+      #field-toolbar > .row { gap: 12px; }
+      #field-toolbar a { color: var(--ink); font: 12px var(--mono); }
+      @media (width <= 1000px) {
+        .explorer-intro { grid-template-columns: 1fr; gap: 24px; }
+        #patterns, #pattern-focus { scroll-margin-top: 180px; }
+        .focus-guide { grid-template-columns: 1fr; gap: 0; }
+        #field-toolbar { flex-wrap: wrap; }
+        .explorer-heading { align-items: start; flex-direction: column; gap: 0; }
+        body.pattern-focused #reference-content [style*="grid-template-columns"] { grid-template-columns: minmax(0, 1fr) !important; }
+      }
+
       @media (width <= 1000px) { main { grid-template-columns: 1fr; } aside { order: -1; position: static; max-height: none; } }
       /* The many two-column sub-demos collapse in narrow containers (container query) */
       @container page (width < 760px) {
@@ -354,6 +414,7 @@
     <a href="#components">Components & HTML</a>
     <a href="#css">Modern CSS</a>
     <a href="#graphics">Canvas, WebGL, WebGPU</a>
+    <a href="#playgrounds">Canvas, frames & multiplayer</a>
     <a href="#apis">Web APIs</a>
     <a href="#js">JS & Intl</a>
     <a href="#sensors">Sensors</a>
@@ -371,7 +432,47 @@
   </header>
 
 <main>
-  <div id="field-toolbar"><span id="current-section">01 / Semantics</span><button id="theme-toggle" type="button" aria-label="Toggle color scheme">Theme</button></div>
+  <div id="field-toolbar"><span id="current-section">Pattern library</span><div class="row"><a href="#patterns">Explore patterns</a><a href="proofs/">Surface lab ↗</a><a href="#semantics">Full reference</a><button id="theme-toggle" type="button" aria-label="Toggle color scheme">Theme</button></div></div>
+  <section id="patterns" aria-labelledby="patterns-title" class="js-only" hidden>
+    <div class="explorer-intro">
+      <div>
+        <p class="eyebrow">Browser-native pattern library</p>
+        <h2 id="patterns-title">Find it. Try it.<br>Build with it.</h2>
+        <p>Start with what you want to make. Open a working example, then give your agent the pattern and your goal.</p>
+        <a href="#semantics">Browse the full platform reference →</a>
+      </div>
+      <div class="skill-setup">
+        <p class="eyebrow">01 / Set up your agent once</p>
+        <h3>Give your agent the reference skill.</h3>
+        <p>Paste this instruction into your agent to install <strong>browser-native-spike</strong> globally. Then use any example’s <strong>Copy agent prompt</strong> button.</p>
+        <div class="row"><button type="button" id="copy-skill-prompt">Copy setup instruction</button><a href="skills/browser-native-spike/SKILL.md">Read the skill ↗</a></div>
+        <details><summary>Prefer the terminal?</summary><code id="skill-command">npx skills add chriswhawkins/one.html --skill browser-native-spike --global</code><button type="button" id="copy-skill-command">Copy command</button><p>Requires Node.js. Choose your agent when prompted. <a href="https://github.com/vercel-labs/skills#usage">CLI instructions ↗</a></p></details>
+      </div>
+    </div>
+    <div class="explorer-goal"><label for="pattern-goal">What are you building? <span>(optional, included in copied prompts)</span></label><input id="pattern-goal" maxlength="500" placeholder="e.g. an offline whiteboard for workshop participants"></div>
+    <div class="explorer-heading"><div><p class="eyebrow">02 / Pick a pattern</p><h3>Browse by what you want to do.</h3></div><p id="pattern-count" role="status"></p></div>
+    <div id="pattern-groups" role="group" aria-label="Pattern categories"></div>
+    <div id="pattern-cards"></div>
+    <p id="pattern-empty" hidden>No patterns match. Try another category or clear the search.</p>
+    <p class="explorer-footnote">These are selected starting points. Every example in the <a href="#semantics">full reference</a> also has an agent prompt. Demos run in this page; focus mode keeps their current state.</p>
+  </section>
+  <section id="pattern-focus" aria-labelledby="focus-title" hidden>
+    <div class="row"><a href="#patterns">← All patterns</a><a id="focus-reference" href="#semantics">View in full reference</a></div>
+    <p class="eyebrow" id="focus-category">03 / Try it, then take it</p>
+    <h2 id="focus-title" tabindex="-1"></h2>
+    <p id="focus-purpose"></p>
+    <div class="focus-guide"><p><strong>Try this</strong><br><span id="focus-try"></span></p><p><strong>Before you use it</strong><br><span id="focus-needs"></span></p></div>
+    <div class="row"><button type="button" id="focus-copy">Copy agent prompt</button><button type="button" id="focus-preview">Customize prompt</button><span id="focus-status" role="status"></span></div>
+  </section>
+  <dialog id="agent-prompt-dialog" aria-labelledby="agent-prompt-title">
+    <form method="dialog" class="row prompt-heading"><h2 id="agent-prompt-title">Agent prompt</h2><button>Close</button></form>
+    <p>Edit the goal if needed, then copy and paste into your agent.</p>
+    <label for="agent-prompt-text">Instruction to copy</label>
+    <textarea id="agent-prompt-text" rows="14" spellcheck="false"></textarea>
+    <div class="row"><button type="button" id="copy-preview-prompt">Copy prompt</button><span id="prompt-copy-status" role="status"></span></div>
+  </dialog>
+  <p id="agent-copy-status" role="status" class="copy-notice"></p>
+
   <div id="no-results" hidden><h2>No examples found</h2><p>Try a platform name such as CSS, clipboard, or storage.</p><button id="clear-search" type="button">Clear search</button></div>
   <article id="reference-content" tabindex="-1">
     <!-- Semantics -->
@@ -420,7 +521,7 @@
       <div class="grid">
         <div>
           <picture>
-            <source type="image/svg+xml" srcset="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='160'%3E%3Crect width='100%25' height='100%25' fill='orange'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='28'%3EPicture%3C/text%3E%3C/svg%3E">
+            <source type="image/svg+xml" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='320'%20height='160'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='orange'/%3E%3Ctext%20x='50%25'%20y='55%25'%20dominant-baseline='middle'%20text-anchor='middle'%20font-size='28'%3EPicture%3C/text%3E%3C/svg%3E">
             <img alt="Picture element fallback" width="320" height="160" loading="lazy" decoding="async" fetchpriority="low" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAAAgCAYAAAB6EwQmAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGElEQVR4nO3BMQEAAADCoPVPbQ0PoAAAAAAAAAAAfQ4hUQAAe7o2gAAAAABJRU5ErkJggg==" />
           </picture>
           <figcaption>picture + source + img</figcaption>
@@ -761,6 +862,35 @@
           <div id="animate-box" class="box">WAAPI</div>
           <button id="animate-btn">Animate</button>
         </div>
+      </div>
+    </section>
+
+    <section id="playgrounds">
+      <h2>Canvas, iframe &amp; multiplayer playgrounds</h2>
+      <p>Small interactive examples with explicit lifecycles. All state here is disposable.</p>
+      <div class="grid">
+        <section>
+          <h3>High-DPI sketch canvas: Pointer Events &amp; PNG export</h3>
+          <p id="sketch-help">Draw with mouse, pen or touch. Focus the canvas and use arrow keys to draw. Resizing preserves strokes; Undo removes the last stroke.</p>
+          <canvas id="sketch" width="640" height="280" tabindex="0" aria-label="Drawing canvas" aria-describedby="sketch-help" style="width:100%;height:240px;touch-action:none;background:white">Use a browser with Canvas 2D to draw.</canvas>
+          <div class="row"><label>Ink <input id="sketch-ink" type="color" value="#245ac7"></label><button id="sketch-undo">Undo stroke</button><button id="sketch-clear">Clear sketch</button><button id="sketch-png">Download PNG</button></div>
+          <p id="sketch-out" role="status">Ready.</p>
+        </section>
+        <section>
+          <h3>Sandboxed iframe &amp; transferable MessageChannel</h3>
+          <p>The child runs scripts with an opaque origin: no parent DOM or storage access. A dedicated port carries validated text messages. Reload closes the old port.</p>
+          <iframe id="channel-frame" title="Isolated message receiver" sandbox="allow-scripts" style="width:100%;height:180px"></iframe>
+          <div class="row"><label>Message <input id="frame-text" maxlength="200" value="Hello, isolated frame!"></label><button id="frame-send" disabled>Send to frame</button><button id="frame-reload">Reload frame</button></div>
+          <p id="frame-out" role="status">Waiting for child.</p>
+        </section>
+        <section>
+          <h3>Local multiplayer: rooms, canvas tokens &amp; presence</h3>
+          <p id="room-help">Open this page in two tabs of the same browser profile and origin, then join the same room. Click or drag to move your token, or focus the board and use arrow keys. BroadcastChannel stays on this device; remote players need signaling and a server or WebRTC connection.</p>
+          <div class="row"><label>Room <input id="room-name" value="lobby" maxlength="40" pattern="[A-Za-z0-9\-]+"></label><button id="room-join">Join room</button><button id="room-leave" disabled>Leave</button><a href="#playgrounds" target="_blank" rel="noopener">Open peer tab</a></div>
+          <canvas id="room-board" width="640" height="280" tabindex="0" aria-label="Multiplayer token board" aria-describedby="room-help" style="width:100%;height:240px;touch-action:none;background:#f3f5fa">A Canvas 2D browser is required.</canvas>
+          <p id="room-out" role="status">Not joined. Presence expires after 10 seconds without a heartbeat.</p>
+          <ul id="room-peers" aria-label="Players and positions"></ul>
+        </section>
       </div>
     </section>
 
@@ -1889,7 +2019,7 @@ test('localStorage API', async () => {
     <p><strong>Tip:</strong> Run this over <code>http://localhost</code> or <code>https://</code> so camera/mic/clipboard/geolocation/notifications/service workers work.</p>
     <div style="margin-top: 1rem; padding: 0.5rem; background: var(--surface-2); border-radius: 6px;">
       <h4 style="margin:0 0 .25rem">Browser Support <span id="support-total" class="badge"></span></h4>
-      <p style="margin:0 0 .5rem; font-size: 12px; color: var(--muted)">Detected in this browser. Tags are approximate cross-engine status as of 2026: <span class="tag">all</span> every major engine · <span class="tag">partial</span> missing somewhere · <span class="tag">exp</span> single-engine / flagged.</p>
+      <p style="margin:0 0 .5rem; font-size: 12px; color: var(--muted)">Presence checks only; permissions and behavior are not verified. Cross-engine tags are historical estimates, not a current compatibility guarantee: <span class="tag">all</span> every major engine · <span class="tag">partial</span> missing somewhere · <span class="tag">exp</span> single-engine / flagged.</p>
       <div id="support-status" class="mono" style="font-size: 12px;"></div>
     </div>
   </dialog>
@@ -1972,10 +2102,11 @@ test('localStorage API', async () => {
   function syncIndex() { index.open = !mobile.matches; }
   syncIndex(); mobile.addEventListener('change', syncIndex);
   function current(section) {
+    if (!document.querySelector('#patterns').hidden) return;
     const i = sections.indexOf(section);
     if (i < 0) return;
     links.forEach((link, j) => { if (i === j) link.setAttribute('aria-current', 'location'); else link.removeAttribute('aria-current'); });
-    document.querySelector('#current-section').textContent = `${String(i + 1).padStart(2, '0')} / ${links[i].textContent}`;
+    if (!document.body.classList.contains('pattern-focused') && document.querySelector('#patterns').hidden) document.querySelector('#current-section').textContent = `${String(i + 1).padStart(2, '0')} / ${links[i].textContent}`;
   }
   document.querySelector('#reference-index').addEventListener('click', e => {
     const link = e.target.closest('a[href^="#"]');
@@ -3699,55 +3830,38 @@ test('localStorage API', async () => {
     $("#export-data").value = JSON.stringify(data, null, 2);
   });
 
-  $("#export-indexeddb").addEventListener('click', async () => {
-    try {
-      const data = {};
+  function exportIndexedDB(){
+    return new Promise((resolve, reject) => {
+      if (!db) return reject(new Error('IndexedDB is not ready or unavailable.'));
       const transaction = db.transaction(['users', 'notes'], 'readonly');
-      
-      // Export users
-      const userStore = transaction.objectStore('users');
-      const users = await new Promise((resolve, reject) => {
-        const request = userStore.getAll();
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-      data.users = users;
-      
-      // Export notes
-      const noteStore = transaction.objectStore('notes');
-      const notes = await new Promise((resolve, reject) => {
-        const request = noteStore.getAll();
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-      data.notes = notes;
-      
-      $("#export-data").value = JSON.stringify(data, null, 2);
-    } catch (err) {
-      $("#export-data").value = `Error exporting data: ${err.message}`;
-    }
+      const data = {};
+      // Queue both reads while the transaction is active; report only after completion.
+      for (const name of ['users', 'notes']) {
+        const request = transaction.objectStore(name).getAll();
+        request.onsuccess = () => { data[name] = request.result; };
+      }
+      transaction.oncomplete = () => resolve(data);
+      transaction.onabort = transaction.onerror = () => reject(transaction.error || new Error('Export aborted.'));
+    });
+  }
+
+  $("#export-indexeddb").addEventListener('click', async () => {
+    try { $("#export-data").value = JSON.stringify(await exportIndexedDB(), null, 2); }
+    catch (err) { $("#export-data").value = `Error exporting data: ${err.message}`; }
   });
 
-  $("#export-all").addEventListener('click', () => {
-    const data = {
-      localStorage: {},
-      sessionStorage: {},
-      indexeddb: {}
-    };
-    
-    // Export localStorage
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      data.localStorage[key] = localStorage.getItem(key);
-    }
-    
-    // Export sessionStorage
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i);
-      data.sessionStorage[key] = sessionStorage.getItem(key);
-    }
-    
-    $("#export-data").value = JSON.stringify(data, null, 2);
+  $("#export-all").addEventListener('click', async () => {
+    try {
+      const data = { localStorage: {}, sessionStorage: {}, indexeddb: await exportIndexedDB() };
+      for (const name of ['localStorage', 'sessionStorage']) {
+        const storage = window[name];
+        for (let i = 0; i < storage.length; i++) {
+          const key = storage.key(i);
+          Object.defineProperty(data[name], key, { value: storage.getItem(key), enumerable: true });
+        }
+      }
+      $("#export-data").value = JSON.stringify(data, null, 2);
+    } catch (err) { $("#export-data").value = `Error exporting data: ${err.message}`; }
   });
 
   $("#import-localStorage").addEventListener('click', () => {
@@ -3765,32 +3879,22 @@ test('localStorage API', async () => {
 
   $("#import-indexeddb").addEventListener('click', async () => {
     try {
-      const data = JSON.parse($("#import-data").value);
-      
-      if (data.users) {
-        const transaction = db.transaction(['users'], 'readwrite');
-        const store = transaction.objectStore('users');
-        for (const user of data.users) {
-          await new Promise((resolve, reject) => {
-            const request = store.add(user);
-            request.onsuccess = () => resolve();
-            request.onerror = () => reject(request.error);
-          });
-        }
-      }
-      
-      if (data.notes) {
-        const transaction = db.transaction(['notes'], 'readwrite');
-        const store = transaction.objectStore('notes');
-        for (const note of data.notes) {
-          await new Promise((resolve, reject) => {
-            const request = store.add(note);
-            request.onsuccess = () => resolve();
-            request.onerror = () => reject(request.error);
-          });
-        }
-      }
-      
+      const input = JSON.parse($("#import-data").value);
+      const data = input?.indexeddb ?? input;
+      if (!db) throw new Error('IndexedDB is not ready or unavailable.');
+      if (!data || (!Array.isArray(data.users) && !Array.isArray(data.notes))) throw new Error('Expected users or notes arrays.');
+      for (const name of ['users', 'notes']) if (data[name] !== undefined && (!Array.isArray(data[name]) || data[name].some(row => !row || typeof row !== 'object' || Array.isArray(row)))) throw new Error('Invalid ' + name + ' records.');
+      // Import both stores atomically. Duplicate keys abort everything, preserving existing data.
+      await new Promise((resolve, reject) => {
+        const transaction = db.transaction(['users', 'notes'], 'readwrite');
+        transaction.oncomplete = resolve;
+        transaction.onabort = transaction.onerror = () => reject(transaction.error || new Error('Import aborted.'));
+        try {
+          for (const name of ['users', 'notes']) for (const row of data[name] || []) transaction.objectStore(name).add(row);
+        } catch (err) { transaction.abort(); reject(err); }
+      });
+      updateDBStatus();
+
       log('IndexedDB data imported successfully', 'success');
     } catch (err) {
       log('Error importing IndexedDB data: ' + err.message, 'error');
@@ -4907,7 +5011,7 @@ on('#inert-toggle', 'click', () => { const t = $('#inert-target'); t.inert = !t.
   addEventListener('pagehide', e => life(`pagehide (persisted=${e.persisted})`));
   addEventListener('online', () => life('online')); addEventListener('offline', () => life('offline'));
   document.addEventListener('freeze', () => life('freeze')); document.addEventListener('resume', () => life('resume'));
-  life(`loaded · online=${navigator.onLine} · prerendering=${document.prerendering ?? 'n/a'} · activation=${navigation?.activation?.navigationType ?? 'n/a'}`);
+  life(`loaded · online=${navigator.onLine} · prerendering=${document.prerendering ?? 'n/a'} · activation=${globalThis.navigation?.activation?.navigationType ?? 'n/a'}`);
 
   $('#uach-btn').addEventListener('click', async () => { const out = $('#uach-out'); if (!navigator.userAgentData) return out.textContent = 'navigator.userAgentData unsupported (Chromium only).'; const v = await navigator.userAgentData.getHighEntropyValues(['architecture', 'bitness', 'model', 'platformVersion', 'fullVersionList', 'formFactors']); out.textContent = JSON.stringify(v, null, 2); });
 })();
@@ -4941,6 +5045,170 @@ on('#inert-toggle', 'click', () => { const t = $('#inert-target'); t.inert = !t.
     if (globalThis.scheduler?.postTask) { const order = []; await Promise.all([scheduler.postTask(() => order.push('background'), { priority: 'background' }), scheduler.postTask(() => order.push('user-blocking'), { priority: 'user-blocking' }), scheduler.postTask(() => order.push('user-visible'))]); logTo('#sched-out', 'postTask ran in priority order: ' + order.join(' → ')); } else logTo('#sched-out', 'scheduler.postTask unsupported');
     if ('requestIdleCallback' in window) requestIdleCallback(d => logTo('#sched-out', `requestIdleCallback: ${d.timeRemaining().toFixed(1)}ms remaining, didTimeout=${d.didTimeout}`), { timeout: 1000 }); else logTo('#sched-out', 'requestIdleCallback unsupported (WebKit)');
   });
+})();
+
+
+// Canvas and messaging playgrounds: no dependencies or persistent data.
+(() => {
+  const canvas = document.querySelector('#sketch'), out = document.querySelector('#sketch-out');
+  const ctx = canvas.getContext('2d');
+  if (!ctx) { out.textContent = 'Canvas 2D unavailable.'; return; }
+  const strokes = [];
+  let stroke = null, pointer = null, pen = { x: .5, y: .5 };
+  function draw(){
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const ratio = Math.min(devicePixelRatio || 1, 3);
+    canvas.width = Math.round(rect.width * ratio); canvas.height = Math.round(rect.height * ratio);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.fillStyle = 'white'; ctx.fillRect(0, 0, rect.width, rect.height);
+    ctx.lineWidth = 3; ctx.lineCap = ctx.lineJoin = 'round';
+    for (const s of strokes) {
+      ctx.strokeStyle = ctx.fillStyle = s.ink; ctx.beginPath();
+      s.points.forEach((p, i) => { if (!i) ctx.moveTo(p.x * rect.width, p.y * rect.height); else ctx.lineTo(p.x * rect.width, p.y * rect.height); });
+      ctx.stroke();
+      if (s.points.length === 1) { const p = s.points[0]; ctx.beginPath(); ctx.arc(p.x * rect.width, p.y * rect.height, 1.5, 0, Math.PI * 2); ctx.fill(); }
+    }
+    out.textContent = `${strokes.length} strokes · ${canvas.width} × ${canvas.height} pixels`;
+  }
+  const point = e => { const r = canvas.getBoundingClientRect(); return { x: Math.max(0, Math.min(1, (e.clientX-r.left)/r.width)), y: Math.max(0, Math.min(1, (e.clientY-r.top)/r.height)) }; };
+  canvas.addEventListener('pointerdown', e => {
+    if (pointer !== null || e.button !== 0) return;
+    canvas.focus(); pointer = e.pointerId; canvas.setPointerCapture(pointer);
+    pen = point(e); stroke = { ink: document.querySelector('#sketch-ink').value, points: [pen] }; strokes.push(stroke); draw();
+  });
+  canvas.addEventListener('pointermove', e => {
+    if (e.pointerId !== pointer || !stroke) return;
+    const events = e.getCoalescedEvents?.() || [];
+    for (const sample of events.length ? events : [e]) { pen = point(sample); stroke.points.push(pen); }
+    draw();
+  });
+  for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) canvas.addEventListener(type, e => { if (e.pointerId === pointer) { pointer = null; stroke = null; } });
+  canvas.addEventListener('keydown', e => {
+    const delta = { ArrowLeft: [-.02,0], ArrowRight: [.02,0], ArrowUp: [0,-.02], ArrowDown: [0,.02] }[e.key];
+    if (!delta) return; e.preventDefault();
+    const next = { x: Math.max(0,Math.min(1,pen.x+delta[0])), y: Math.max(0,Math.min(1,pen.y+delta[1])) };
+    strokes.push({ ink: document.querySelector('#sketch-ink').value, points: [pen,next] }); pen = next; draw();
+  });
+  document.querySelector('#sketch-undo').onclick = () => { strokes.pop(); stroke = null; pointer = null; draw(); };
+  document.querySelector('#sketch-clear').onclick = () => { strokes.length = 0; stroke = null; pointer = null; draw(); };
+  document.querySelector('#sketch-png').onclick = () => {
+    canvas.toBlob(blob => {
+      if (!blob) { out.textContent = 'PNG encoding failed.'; return; }
+      const url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = 'sketch.png'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }, 'image/png');
+  };
+  if ('ResizeObserver' in window) new ResizeObserver(draw).observe(canvas);
+  else window.addEventListener('resize', draw);
+  draw();
+})();
+
+(() => {
+  const frame = document.querySelector('#channel-frame'), out = document.querySelector('#frame-out'), send = document.querySelector('#frame-send');
+  if (!('MessageChannel' in window)) { out.textContent = 'MessageChannel unavailable.'; return; }
+  let port, timer;
+  frame.addEventListener('load', () => {
+    port?.close(); clearTimeout(timer); send.disabled = true;
+    const channel = new MessageChannel(); port = channel.port1;
+    port.onmessage = ({data}) => {
+      if (!data || !['ready','echo'].includes(data.type) || typeof data.text !== 'string' || data.text.length > 300) return;
+      clearTimeout(timer); send.disabled = false; out.textContent = data.text;
+    };
+    // Opaque sandbox origins require '*'; only this known child receives the port.
+    frame.contentWindow.postMessage({type:'connect'}, '*', [channel.port2]);
+    timer = setTimeout(() => { out.textContent = 'Child did not respond. Scripts may be blocked; try Reload frame.'; }, 3000);
+  });
+  function reload(){
+    port?.close(); clearTimeout(timer); send.disabled = true; out.textContent = 'Connecting to isolated child…';
+    frame.srcdoc = `<!doctype html><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'"><style>body{font:16px system-ui;padding:12px}output{display:block;overflow-wrap:anywhere}</style><h3>Isolated child</h3><output>Waiting for a port.</output><script>
+      let connected = false;
+      window.addEventListener('message', e => {
+        if (connected || e.source !== parent || e.data?.type !== 'connect' || e.ports.length !== 1) return;
+        connected = true; const port = e.ports[0];
+        port.onmessage = ({data}) => {
+          if (data?.type !== 'text' || typeof data.text !== 'string' || data.text.length > 200) return;
+          document.querySelector('output').textContent = data.text;
+          port.postMessage({type:'echo', text:'Child received: ' + data.text});
+        };
+        port.postMessage({type:'ready', text:'Dedicated port connected. Child has an opaque origin.'});
+      });
+    <\/script>`;
+  }
+  send.onclick = () => port?.postMessage({ type: 'text', text: document.querySelector('#frame-text').value.slice(0,200) });
+  document.querySelector('#frame-reload').onclick = reload;
+  window.addEventListener('pagehide', () => { port?.close(); clearTimeout(timer); });
+  window.addEventListener('pageshow', e => { if (e.persisted) reload(); });
+  reload();
+})();
+
+(() => {
+  const canvas = document.querySelector('#room-board'), ctx = canvas.getContext('2d'), out = document.querySelector('#room-out');
+  const join = document.querySelector('#room-join'), leaveButton = document.querySelector('#room-leave'), list = document.querySelector('#room-peers');
+  if (!ctx || !('BroadcastChannel' in window)) { out.textContent = 'This demo needs Canvas 2D and BroadcastChannel.'; join.disabled = true; return; }
+  const id = crypto.randomUUID(), peers = new Map();
+  let channel = null, heartbeat, room = '', seq = 0, dragging = null;
+  const self = { id, x: .5, y: .5, seq: 0 };
+  function draw(){
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const ratio = Math.min(devicePixelRatio || 1, 3);
+    canvas.width = Math.round(rect.width * ratio); canvas.height = Math.round(rect.height * ratio);
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    list.replaceChildren();
+    for (const p of [self, ...peers.values()]) {
+      if (!channel) break;
+      ctx.fillStyle = p.id === id ? '#245ac7' : '#a33461';
+      ctx.beginPath(); ctx.arc(16+p.x*(rect.width-32),16+p.y*(rect.height-32),12,0,Math.PI*2); ctx.fill();
+      ctx.font = '12px system-ui'; ctx.fillText(p.id.slice(0,4),Math.min(rect.width-36,16+p.x*(rect.width-32)),Math.max(12,p.y*(rect.height-32)));
+      const li = document.createElement('li'); li.textContent = `${p.id === id ? 'You' : p.id.slice(0,4)}: ${Math.round(p.x*100)}%, ${Math.round(p.y*100)}%`; list.append(li);
+    }
+  }
+  function publish(type='state'){ if (channel) channel.postMessage({type, ...self, seq: ++seq}); }
+  function leave(){
+    publish('leave'); channel?.close(); channel = null; clearInterval(heartbeat); peers.clear(); dragging = null;
+    leaveButton.disabled = true; join.disabled = false; out.textContent = 'Not joined. Nothing is saved.'; draw();
+  }
+  join.onclick = () => {
+    const name = document.querySelector('#room-name').value.trim();
+    if (!/^[A-Za-z0-9-]{1,40}$/.test(name)) { out.textContent = 'Use 1–40 letters, numbers or hyphens for the room.'; return; }
+    leave(); room = name;
+    try { channel = new BroadcastChannel('kitchen-sink-room:' + room); }
+    catch (e) { out.textContent = 'Unable to join: ' + e.message; return; }
+    leaveButton.disabled = false; join.disabled = true;
+    const status = () => { out.textContent = `Room ${room} · ${peers.size+1} players · you are ${id.slice(0,4)} · local browser only`; };
+    channel.onmessage = ({data:p}) => {
+      if (!p || !['hello','state','leave'].includes(p.type) || typeof p.id !== 'string' || !/^[a-f0-9-]{36}$/.test(p.id) || p.id === id || !Number.isSafeInteger(p.seq) || !Number.isFinite(p.x) || !Number.isFinite(p.y) || p.x < 0 || p.x > 1 || p.y < 0 || p.y > 1) return;
+      if (p.seq <= (peers.get(p.id)?.seq ?? -1)) return;
+      if (p.type === 'leave') peers.delete(p.id);
+      else if (peers.has(p.id) || peers.size < 32) peers.set(p.id, { ...p, seen: Date.now() });
+      if (p.type === 'hello') publish();
+      draw(); status();
+    };
+    heartbeat = setInterval(() => {
+      for (const [key,p] of peers) if (Date.now()-p.seen > 10000) peers.delete(key);
+      publish(); draw(); status();
+    }, 2000);
+    publish('hello'); draw(); status();
+  };
+  function move(e){
+    if (!channel) return;
+    const r = canvas.getBoundingClientRect();
+    self.x = Math.max(0,Math.min(1,(e.clientX-r.left-16)/(r.width-32)));
+    self.y = Math.max(0,Math.min(1,(e.clientY-r.top-16)/(r.height-32)));
+    publish(); draw();
+  }
+  canvas.addEventListener('pointerdown', e => { if (!channel || e.button !== 0 || dragging !== null) return; dragging = e.pointerId; canvas.focus(); canvas.setPointerCapture(dragging); move(e); });
+  canvas.addEventListener('pointermove', e => { if (dragging === e.pointerId) move(e); });
+  for (const type of ['pointerup','pointercancel','lostpointercapture']) canvas.addEventListener(type, e => { if (dragging === e.pointerId) dragging = null; });
+  canvas.addEventListener('keydown', e => {
+    const delta = {ArrowLeft:[-.05,0],ArrowRight:[.05,0],ArrowUp:[0,-.05],ArrowDown:[0,.05]}[e.key];
+    if (!delta || !channel) return; e.preventDefault();
+    self.x = Math.max(0,Math.min(1,self.x+delta[0])); self.y = Math.max(0,Math.min(1,self.y+delta[1])); publish(); draw();
+  });
+  if ('ResizeObserver' in window) new ResizeObserver(draw).observe(canvas);
+  else window.addEventListener('resize', draw);
+  leaveButton.onclick = leave;
+  window.addEventListener('pagehide', leave);
 })();
 
 // ===== Aside: grouped feature detection =====
@@ -4987,6 +5255,240 @@ on('#inert-toggle', 'click', () => { const t = $('#inert-target'); t.inert = !t.
   $('#support-total').textContent = `${ok}/${total}`;
   consoleLog(`Feature detection: ${ok}/${total} available in this browser`, 'success');
 })();
+</script>
+
+<script>
+// Discover → try the existing live DOM → hand the source pointers to an agent.
+(() => {
+  const $ = selector => document.querySelector(selector);
+  const root = $('#reference-content'), explorer = $('#patterns'), focusPanel = $('#pattern-focus');
+  const query = $('#capability-query'), dialog = $('#agent-prompt-dialog');
+  const pageURL = new URL(location.href); pageURL.search = ''; pageURL.hash = '';
+  const records = [], byKey = new Map();
+  let active = null, category = 'draw', noticeTimer;
+  const groups = { draw: 'Draw & create', connect: 'Connect & collaborate', store: 'Save & work offline', compose: 'Build interfaces', perform: 'Keep it responsive', all: 'All patterns' };
+  const headingText = heading => {
+    const copy = heading.cloneNode(true); copy.querySelectorAll('.badge, .tag, .sample-link').forEach(el => el.remove());
+    return copy.textContent.replace(/\s+/g, ' ').trim();
+  };
+  function addRecord(heading, nodes, section){
+    const title = headingText(heading);
+    const ids = [...new Set(nodes.flatMap(node => [node, ...node.querySelectorAll('[id]')]).filter(node => node.id).map(node => node.id))];
+    const slug = (ids[0] || title.toLowerCase().replace(/[^a-z0-9]+/g, '-')).slice(0,100);
+    let key = heading.tagName === 'H2' ? section.id : section.id + '--' + slug;
+    if (byKey.has(key)) key += '-' + records.length;
+    const record = { key, title, sourceTitle: title, heading, nodes, section, ids, category: '', purpose: 'Adapt this browser-native interaction to your project.', exercise: 'Use the live controls below and inspect the resulting state or output.', needs: 'Check the example’s feature detection, permissions and browser requirements before adopting it.' };
+    const actions = document.createElement('div'); actions.className = 'example-actions';
+    const focus = document.createElement('button'); focus.type = 'button'; focus.textContent = 'Focus demo'; focus.setAttribute('aria-label', 'Focus demo: ' + title);
+    focus.onclick = () => { location.hash = 'use/' + encodeURIComponent(key); };
+    const copy = document.createElement('button'); copy.type = 'button'; copy.textContent = 'Copy agent prompt'; copy.setAttribute('aria-label', 'Copy agent prompt: ' + title);
+    copy.onclick = () => copyText(promptFor(record), title);
+    actions.append(focus, copy);
+    (heading.tagName === 'H2' ? heading.parentElement : heading).after(actions);
+    records.push(record); byKey.set(key, record);
+  }
+  // A flat subsection spans its heading to the next heading. Existing grouped
+  // sections remain intact; no controls, canvases or frames are cloned or moved.
+  for (const heading of root.querySelectorAll('h3')) {
+    const section = heading.closest('article > section');
+    if (!section) continue;
+    const parent = heading.parentElement;
+    let nodes;
+    if (parent !== section && parent.matches('section')) nodes = [parent];
+    else {
+      nodes = [heading];
+      for (let next = heading.nextElementSibling; next && next.tagName !== 'H3'; next = next.nextElementSibling) nodes.push(next);
+    }
+    addRecord(heading, nodes, section);
+  }
+  for (const section of root.children) addRecord(section.querySelector('h2'), [section], section);
+
+  // Curate outcomes and exercises, while source pointers come from the real demos.
+  const featured = [
+    ['#sketch', 'draw', 'Draw with pointer & pen', 'Sketchpads, annotations and signature-style input, with a sharp canvas and PNG export.', 'Draw a stroke, resize the window, undo it, then download a PNG. Arrow keys also draw.', 'Canvas 2D · Pointer Events · local, disposable strokes'],
+    ['#worker-image-process', 'draw', 'Render away from the UI', 'Move image rendering and filtering into a worker so the page can stay interactive.', 'Render & filter off-thread, then run the module-worker example and inspect its output.', 'OffscreenCanvas · module workers · browser support varies'],
+    ['#gen-clip', 'draw', 'Turn a canvas into a clip', 'Generate a video from an animation without a video file or editing library.', 'Choose Record canvas → video, wait for recording, then play the generated clip.', 'Canvas captureStream · MediaRecorder · supported codec required'],
+    ['#c2d', 'draw', 'Compare graphics surfaces', 'See Canvas 2D, WebGL2 and WebGPU alongside a native animation.', 'Compare the rendered canvases and the GPU status, then animate the WAAPI box.', 'WebGPU requires a secure context and an available adapter'],
+    ['#room-board', 'connect', 'Shared room & live presence', 'Prototype a shared board with movable tokens, room isolation and expiring presence.', 'Open a peer tab, join the same room, move a token, then leave. Watch both player lists.', 'Same browser profile + origin only · no remote synchronization'],
+    ['#channel-frame', 'connect', 'Talk to an isolated iframe', 'Embed a small tool and exchange messages without giving it access to the parent page.', 'Send a message, reload the child, then send again through the new dedicated port.', 'Sandboxed opaque origin · MessageChannel · text-only payloads'],
+    ['#bc-send', 'connect', 'Coordinate work across tabs', 'Broadcast a local change and prevent tabs from doing the same exclusive work at once.', 'Open a second tab, broadcast a message, hold a lock, and query locks from the other tab.', 'Same browser + origin · Web Locks needs a secure context'],
+    ['#rtc-btn', 'connect', 'Connect two data-channel peers', 'Learn the WebRTC connection lifecycle before building remote collaboration.', 'Connect the two in-page peers and inspect the data-channel messages.', 'In-page loopback only · remote use needs signaling and often TURN'],
+    ['#user-add', 'store', 'Keep structured data locally', 'Persist records, search an index and inspect local database behavior.', 'Add a disposable user, retrieve it, and search by name.', 'IndexedDB · origin-scoped storage · use disposable test records'],
+    ['#export-all', 'store', 'Export a portable backup', 'Move browser data into JSON and import records atomically.', 'Export all, inspect users and notes, then try importing a disposable record.', 'Includes this demo’s IndexedDB stores · imported keys must be unique'],
+    ['#sw-register', 'store', 'Make an app shell work offline', 'Cache a small app shell with scoped registration and network fallback.', 'Register, ping the service worker, then reload offline after the shell is cached.', 'HTTPS or localhost · separate sw.js · shell caching is not data sync'],
+    ['#opfs-write', 'store', 'Save files inside the origin', 'Use a private filesystem for local working files without a file-picker flow.', 'Write a disposable file, read it back, list files, then delete that file.', 'OPFS · secure context · private to this browser origin'],
+    ['#cmd-dialog-btn', 'compose', 'Compose native overlays', 'Use dialogs, popovers and anchored UI for menus, prompts and contextual help.', 'Open an overlay, try keyboard dismissal, then compare automatic and manual popovers.', 'Experimental command and anchor features vary by browser'],
+    ['.cq-wrap', 'compose', 'Adapt a component to its space', 'Make a component respond to its container instead of the whole viewport.', 'Resize the wrapper past 420px and compare the layout with its CSS source.', 'CSS container queries · drag the resize handle'],
+    ['#state-increment', 'compose', 'Connect state to a small UI', 'Explore a reactive counter, todo list and change history with plain JavaScript.', 'Increment the counter, add a todo, and inspect the recorded state changes.', 'In-memory state · reload resets this demonstration'],
+    ['#router-home', 'compose', 'Navigate without a framework', 'Connect URL state, browser history and view rendering in a small app.', 'Visit two routes, then use the router’s Back and Forward controls.', 'Navigation API with History fallback · demo routes stay in the hash'],
+    ['#worker-fibonacci', 'perform', 'Move costly work to a worker', 'Compare a blocking calculation with background work while watching the UI.', 'Compute once on the main thread, then in the worker; compare the spinner.', 'Main-thread example intentionally freezes briefly'],
+    ['#sched-yield', 'perform', 'Break up a long task', 'Keep long browser tasks responsive by yielding between chunks of work.', 'Compare blocking and yielding runs; inspect elapsed time and painted frames.', 'scheduler.yield where available · timer fallback otherwise'],
+    ['#virtual-generate', 'perform', 'Render a large list in a small DOM', 'Explore virtual scrolling for large lists without rendering every row at once.', 'Generate 10,000 rows and scroll; compare item count with visible row count.', 'Fixed-height rows · in-memory data · inspect accessibility for your use case']
+  ];
+  const catalog = [];
+  for (const [selector, group, title, purpose, exercise, needs] of featured) {
+    const control = $(selector);
+    const record = records.find(record => record.nodes.some(node => node === control || node.contains(control)));
+    if (!record) continue;
+    Object.assign(record, { category: group, title, purpose, exercise, needs, selector });
+    catalog.push(record);
+  }
+
+  // Larger end-to-end proofs keep their own inspectable, portable document.
+  for (const [key, group, title, purpose, exercise, needs] of [
+    ['surface', 'draw', 'Export an editable HTML surface', 'Create cards, images and ink; carry the entire working surface into one HTML file.', 'Edit, draw, export HTML, reopen offline and check the state round trip.', 'Self-contained HTML · validated data import · local recovery'],
+    ['connect', 'connect', 'Pair real browsers and hand over control', 'Share a surface over WebRTC with host-owned revisions and revocable peer editing.', 'Create a session, join from another browser, grant control and test a stale draft.', 'Optional Python pairing server · HTTPS for phones · TURN may be needed'],
+    ['agents', 'compose', 'Give an agent versioned commands', 'Expose the same application commands to humans and compatible WebMCP clients.', 'Propose an edit, change the state, then verify the stale proposal is rejected.', 'Command inspector works locally · native WebMCP needs a compatible browser'],
+    ['render', 'draw', 'Stream HTML and draw live DOM', 'Test native out-of-order HTML updates and interactive HTML inside canvas.', 'Type during streamed updates; test canvas text selection, focus and PNG export.', 'Streaming helper required · HTML-in-Canvas is experimental'],
+    ['measure', 'perform', 'Measure the full codec round trip', 'Compare portable state and raster output; encode and decode actual video frames.', 'Measure artifact bytes, encode/decode 30 frames and record device observations.', 'WebCodecs support varies · mobile hardware checks are explicit observations']
+  ]) {
+    catalog.push({ key: 'lab-' + key, category: group, title, sourceTitle: title, purpose, exercise, needs, ids: [], selector: '#' + key, section: {id: key}, sourcePath: 'proofs/index.html', href: 'proofs/#' + key });
+  }
+
+  catalog.push({ key: 'lab-runtime', category: 'perform', title: 'Run SQL, Python and a transport round trip', sourceTitle: 'Runtime & transport lab', purpose: 'Run real WebAssembly runtimes in workers and verify an echoed network payload.', exercise: 'Load a runtime, run code, save/restore a SQLite snapshot and terminate a runaway worker. Verify a WebSocket echo.', needs: 'Explicit pinned CDN downloads · optional Python echo server · WebTransport needs a compatible endpoint', ids: [], selector: '#runtime', section: {id: 'runtime'}, sourcePath: 'proofs/runtime.html', href: 'proofs/runtime.html' });
+
+  function promptFor(record){
+    const goal = $('#pattern-goal').value.trim();
+    const source = new URL(record.sourcePath || 'index.html', pageURL);
+    const live = new URL(record.href || pageURL, pageURL); if (!record.href) live.hash = 'use/' + encodeURIComponent(record.key);
+    const selectors = [...new Set([record.selector, ...record.ids.slice(0,12).map(id => '#' + id)].filter(Boolean))];
+    return `Use $browser-native-spike to adapt a browser-native pattern to my current project.\n\nGoal: ${goal || 'Apply this pattern to the task we are working on; use the existing project context to choose the smallest useful implementation.'}\nPattern: ${record.title}\nUse it for: ${record.purpose}\n\nLive reference: ${live.href}\nSource document: ${source.href}\nRepository fallback: https://raw.githubusercontent.com/chriswhawkins/one.html/main/${record.sourcePath || 'index.html'}\nSource section: #${record.section.id}\nSource heading: ${record.sourceTitle}\nLocate the matching HTML and event handlers with: ${selectors.join(', ') || record.sourceTitle}\n\nTry / verify: ${record.exercise}\nRequirements and limits: ${record.needs}\n\nRead the matching markup, CSS and JavaScript before implementing. Follow dependencies into support files (including sw.js when relevant). Adapt only the behavior needed for my goal to the current project's conventions. Preserve keyboard access, cleanup and meaningful unsupported/error states. Verify the resulting interaction in a browser and report the source used and any remaining limits.\n\nThe live/source URLs identify the version I am viewing. Localhost or file URLs require access to the same machine; this preview may contain unpublished changes. If unavailable, check the repository fallback for this exact pattern. If it is missing there too, ask me for the source instead of inventing it.`;
+  }
+  function preview(text, title, message=''){
+    $('#agent-prompt-title').textContent = title;
+    $('#agent-prompt-text').value = text;
+    $('#prompt-copy-status').textContent = message;
+    if (!dialog.open) dialog.showModal();
+    $('#agent-prompt-text').focus(); $('#agent-prompt-text').select();
+  }
+  async function copyText(text, title){
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText(text);
+      $('#agent-copy-status').textContent = 'Copied. Paste into your agent.';
+      if (dialog.open) $('#prompt-copy-status').textContent = 'Copied.';
+      clearTimeout(noticeTimer); noticeTimer = setTimeout(() => { $('#agent-copy-status').textContent = ''; }, 3500);
+    } catch {
+      preview(text, title, 'Clipboard access is unavailable. The text is selected; press Ctrl/Cmd+C to copy.');
+    }
+  }
+  const install = $('#skill-command').textContent;
+  $('#copy-skill-command').onclick = () => copyText(install, 'Install the skill globally');
+  $('#copy-skill-prompt').onclick = () => copyText(`Install the browser-native-spike skill globally for this agent from https://github.com/chriswhawkins/one.html (skill directory: skills/browser-native-spike). Use your supported skill installer, or run:\n\n${install}\n\nSelect this agent during installation. Confirm that the skill is discoverable across projects. I will then paste a specific example prompt that invokes $browser-native-spike and identifies the source pattern.`, 'Set up your agent');
+  $('#copy-preview-prompt').onclick = () => copyText($('#agent-prompt-text').value, $('#agent-prompt-title').textContent);
+  $('#focus-copy').onclick = () => { if (active) copyText(promptFor(active), active.title); };
+  $('#focus-preview').onclick = () => { if (active) preview(promptFor(active), active.title); };
+
+  for (const [key, label] of Object.entries(groups)) {
+    const button = document.createElement('button'); button.type = 'button'; button.dataset.category = key;
+    button.textContent = `${label} (${key === 'all' ? catalog.length : catalog.filter(r => r.category === key).length})`;
+    button.onclick = () => { category = key; filterCards(); };
+    $('#pattern-groups').append(button);
+  }
+  for (const record of catalog) {
+    const card = document.createElement('div'); card.className = 'pattern-card'; card.dataset.key = record.key;
+    const label = document.createElement('p'); label.className = 'eyebrow'; label.textContent = groups[record.category];
+    const heading = document.createElement('h4'); heading.textContent = record.title;
+    const purpose = document.createElement('p'); purpose.textContent = record.purpose;
+    const needs = document.createElement('p'); needs.className = 'pattern-needs'; needs.textContent = record.needs;
+    const actions = document.createElement('div'); actions.className = 'row';
+    const link = document.createElement('a'); link.className = 'try-pattern'; link.href = record.href || '#use/' + encodeURIComponent(record.key); link.textContent = 'Try pattern →'; link.setAttribute('aria-label', 'Try pattern: ' + record.title);
+    const copy = document.createElement('button'); copy.type = 'button'; copy.textContent = 'Copy agent prompt'; copy.setAttribute('aria-label', 'Copy agent prompt: ' + record.title); copy.onclick = () => copyText(promptFor(record), record.title);
+    actions.append(link, copy); card.append(label, heading, purpose, needs, actions); $('#pattern-cards').append(card);
+    record.card = card;
+  }
+  function filterCards(){
+    const terms = query.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
+    let count = 0;
+    for (const record of catalog) {
+      const text = [record.title, record.sourceTitle, record.purpose, record.needs, groups[record.category]].join(' ').toLowerCase();
+      const show = (category === 'all' || category === record.category) && terms.every(term => text.includes(term));
+      record.card.hidden = !show; if (show) count++;
+    }
+    $('#pattern-groups').querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.category === category)));
+    $('#pattern-count').textContent = `${count} ${count === 1 ? 'pattern' : 'patterns'}`;
+    $('#pattern-empty').hidden = count !== 0;
+    if (!explorer.hidden) { $('#search-status').textContent = terms.length ? `${count} matching patterns` : ''; $('#no-results').hidden = true; }
+  }
+  function unmask(){
+    root.querySelectorAll('.focus-hidden, .focus-layout').forEach(node => node.classList.remove('focus-hidden', 'focus-layout'));
+    document.body.classList.remove('pattern-focused'); focusPanel.hidden = true; active = null;
+  }
+  function focusRecord(record, moveFocus){
+    unmask(); active = record;
+    root.classList.remove('catalog-hidden'); explorer.hidden = true; focusPanel.hidden = false;
+    document.body.classList.add('pattern-focused');
+    root.querySelectorAll('.search-hidden').forEach(node => node.classList.remove('search-hidden'));
+    query.value = ''; $('#search-status').textContent = ''; $('#no-results').hidden = true;
+    let visible = record.nodes;
+    while (visible[0].parentElement && visible[0].parentElement !== root.parentElement) {
+      const parent = visible[0].parentElement;
+      for (const sibling of parent.children) if (!visible.includes(sibling)) sibling.classList.add('focus-hidden');
+      if (parent === root) break;
+      if (parent.classList.contains('grid')) parent.classList.add('focus-layout');
+      visible = [parent];
+    }
+    $('#focus-title').textContent = record.title;
+    $('#focus-purpose').textContent = record.purpose;
+    $('#focus-try').textContent = record.exercise;
+    $('#focus-needs').textContent = record.needs;
+    $('#focus-reference').href = '#' + record.section.id;
+    $('#current-section').textContent = (groups[record.category] || 'Reference') + ' / Focus demo';
+    if (moveFocus) { $('#focus-title').focus({preventScroll:true}); focusPanel.scrollIntoView(); }
+  }
+  function route(moveFocus=true){
+    const hash = location.hash.slice(1);
+    if (hash.startsWith('use/')) {
+      let key; try { key = decodeURIComponent(hash.slice(4)); } catch { key = ''; }
+      const record = byKey.get(key);
+      if (record) { focusRecord(record, moveFocus); return; }
+    }
+    unmask();
+    const catalogView = !hash || hash === 'patterns' || hash.startsWith('use/');
+    explorer.hidden = !catalogView; root.classList.toggle('catalog-hidden', catalogView);
+    if (catalogView) {
+      $('#current-section').textContent = 'Explore / Browser-native patterns';
+      document.querySelectorAll('#section-index a[aria-current]').forEach(link => link.removeAttribute('aria-current'));
+      filterCards();
+      if (moveFocus) explorer.scrollIntoView();
+    } else {
+      const target = document.getElementById(hash);
+      const section = target?.closest('article > section');
+      if (section) $('#current-section').textContent = 'Reference / ' + headingText(section.querySelector('h2'));
+      if (moveFocus && target && root.contains(target)) target.scrollIntoView();
+    }
+  }
+  query.addEventListener('input', () => {
+    if (active) { history.replaceState(null, '', '#patterns'); route(false); }
+    if (!explorer.hidden) { category = 'all'; filterCards(); }
+  });
+  query.addEventListener('keydown', e => { if (e.key === 'Escape' && !explorer.hidden) filterCards(); });
+  window.addEventListener('hashchange', () => route());
+  // Existing section clicks also need to reveal a section when its hash is unchanged.
+  document.addEventListener('click', e => {
+    const link = e.target.closest('a[href^="#"]');
+    if (link && link.hash === location.hash && !link.closest('#agent-prompt-dialog')) route();
+  });
+  // Native WebMCP is progressive enhancement; the same catalog and prompts
+  // remain available through normal links and buttons when it is absent.
+  if (document.modelContext?.registerTool) {
+    const result = value => ({content: [{type: 'text', text: JSON.stringify(value)}]});
+    const lookup = args => {
+      if (!args || typeof args.key !== 'string') throw new Error('A pattern key is required.');
+      const record = catalog.find(record => record.key === args.key) || byKey.get(args.key);
+      if (!record) throw new Error('Unknown pattern key. Use list_patterns first.');
+      return record;
+    };
+    const inputSchema = {type: 'object', properties: {key: {type: 'string'}}, required: ['key'], additionalProperties: false};
+    (async () => { try {
+      await document.modelContext.registerTool({name: 'list_patterns', description: 'List the browser-native patterns and their requirements.', inputSchema: {type: 'object', properties: {}, additionalProperties: false}, execute: async () => result(catalog.map(({key,title,purpose,needs}) => ({key,title,purpose,needs})))});
+      await document.modelContext.registerTool({name: 'get_pattern_prompt', description: 'Read the reusable agent prompt and source pointers for a pattern.', inputSchema, execute: async args => result({prompt: promptFor(lookup(args))})});
+      await document.modelContext.registerTool({name: 'open_pattern', description: 'Open a live pattern in this browser tab.', inputSchema, execute: async args => { const record = lookup(args); if (record.href) location.href = record.href; else location.hash = 'use/' + encodeURIComponent(record.key); return result({opened: record.key}); }});
+    } catch (error) { $('#agent-copy-status').textContent = 'WebMCP registration unavailable: ' + error.message; } })();
+  }
+  filterCards(); route(false);
+})();
+
 </script>
 
 <!-- Import maps + module script + import.meta demo -->
