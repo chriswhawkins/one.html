@@ -22,7 +22,9 @@
     .handle { cursor: grab; user-select: none; display: grid; place-items: center; }
     .handle:active { cursor: grabbing; }
     .content[contenteditable="true"] { outline: 2px solid color-mix(in oklab, Highlight 60%, Canvas); border-radius: 6px; padding: .25rem; background: color-mix(in oklab, Canvas 97%, CanvasText 0%); }
-    .actions { display: flex; gap: .25rem; align-items: center; }
+    .content { min-width: 0; overflow-wrap: anywhere; }
+    @media (max-width: 600px){ .item { grid-template-columns: 28px minmax(0, 1fr); } .actions { grid-column: 2; } .toolbar { flex-wrap: wrap; } }
+    .actions { flex-wrap: wrap; display: flex; gap: .25rem; align-items: center; }
     button.icon { background: none; border: var(--border); border-radius: 8px; padding: .25rem .4rem; }
     .drop-hint { border: 2px dashed color-mix(in oklab, CanvasText 30%, transparent); border-radius: 10px; padding: .5rem; text-align: center; opacity: .8; }
     .dropping { background: color-mix(in oklab, Highlight 12%, Canvas); }
@@ -77,6 +79,7 @@
     </main>
 
     <aside>
+      <p id="save-status" role="status">Edits are saved locally. No remote synchronization.</p>
       <h3>Revision Timeline</h3>
       <div class="timeline" id="timeline"></div>
       <div class="toolbar" style="margin-top:.5rem">
@@ -88,7 +91,7 @@
       <h3>Notes</h3>
       <ul>
         <li>All edits are operations appended to an event log in IndexedDB.</li>
-        <li>State is derived by reducing ops (event‑sourced). Undo pushes a compensating op.</li>
+        <li>State is derived by reducing ops (event‑sourced). Undo is session-only and clears after peer changes to avoid stale inverses.</li>
         <li>Service Worker caches the app shell for offline <em>(requires a separate <code>sw.js</code> file served over http(s) or localhost)</em>.</li>
       </ul>
     </aside>
@@ -219,10 +222,6 @@
     return idb;
   }
 
-  async function opsAdd(op){
-    const db = await dbOpen();
-    await tx(db, STORE_OPS, 'readwrite', store => store.put(op));
-  }
   async function opsAll(){
     const db = await dbOpen();
     const all = [];
@@ -230,7 +229,7 @@
       const cur = e.target.result; if (!cur) return; all.push(cur.value); cur.continue();
     });
     // sort by ts asc if needed
-    all.sort((a,b)=>a.ts.localeCompare(b.ts));
+    all.sort((a,b)=>a.ts.localeCompare(b.ts) || a.id.localeCompare(b.id));
     return all;
   }
   async function opsClear(){
@@ -242,7 +241,7 @@
       const t = db.transaction(store, mode); const s = t.objectStore(store);
       const ret = fn(s);
       t.oncomplete = () => res(ret);
-      t.onerror = () => rej(t.error);
+      t.onabort = t.onerror = () => rej(t.error || new Error('Transaction aborted.'));
     });
   }
 
@@ -252,13 +251,15 @@
     try {
       const reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
       await navigator.serviceWorker.ready;
-      $('#sync-pill').textContent = 'offline-ready';
+      $('#sync-pill').textContent = 'shell cached for offline';
       console.log('SW registered', reg);
     } catch (e){ console.warn('SW register failed', e); }
   })();
 
   // ---------- UI helpers ----------
+  let activeEdit = null;
   function render(){
+    if (activeEdit) return; // Keep the live DOM and selection until save or cancel.
     // Render items in each section
     ['header','main','aside','footer'].forEach(sec => {
       const container = $(`section.landmark[data-section="${sec}"] .items`);
@@ -293,6 +294,24 @@
     // Duplicate
     node.querySelector('.dup').addEventListener('click', () => duplicateItem(section, item.id));
 
+    for (const [label, offset] of [['Move up', -1], ['Move down', 1]]) {
+      const button = document.createElement('button'); button.className = 'icon';
+      button.textContent = offset < 0 ? '↑' : '↓'; button.setAttribute('aria-label', label);
+      button.disabled = offset < 0 ? index === 0 : index === derivedState.sections[section].length - 1;
+      button.addEventListener('click', async () => {
+        await moveItem(section, section, item.id, index + offset);
+        document.querySelector(`[data-id="${item.id}"] .edit`)?.focus();
+      });
+      $('.actions', node).append(button);
+    }
+    const destination = document.createElement('select'); destination.setAttribute('aria-label', 'Move to section');
+    for (const name of Object.keys(derivedState.sections)) destination.add(new Option(name, name, false, name === section));
+    destination.addEventListener('change', async () => {
+      await moveItem(section, destination.value, item.id);
+      document.querySelector(`[data-id="${item.id}"] .edit`)?.focus();
+    });
+    $('.actions', node).append(destination);
+
     // Drag & drop
     node.addEventListener('dragstart', e => {
       node.setAttribute('aria-grabbed', 'true');
@@ -319,7 +338,9 @@
     try {
       const data = JSON.parse(e.dataTransfer.getData('text/plain'));
       const toSection = secEl.dataset.section;
-      const toIndex = findDropIndex(e, secEl);
+      let toIndex = findDropIndex(e, secEl);
+      const fromIndex = derivedState.sections[toSection]?.indexOf(data.id);
+      if (data.fromSection === toSection && fromIndex >= 0 && fromIndex < toIndex) toIndex--;
       if (data.fromSection === toSection && toIndex != null){
         // reorder within same section
         moveItem(data.fromSection, toSection, data.id, toIndex);
@@ -341,16 +362,63 @@
   }
 
   // ---------- Commands (create/update/delete/move) ----------
-  async function commit(op, recordHistory=true){
-    // Link inverse (for redo), compute inverse against CURRENT state
-    const inverse = inverses[op.type]?.(op, derivedState);
-    // Unique, increasing timestamps preserve operation order after an IndexedDB reload.
-    const ts = new Date(Math.max(Date.now(), (Date.parse(inMemoryOps.at(-1)?.ts) || 0) + 1)).toISOString();
-    const full = { id: uuid(), ts, ...op, inverse: inverse||null };
-    await opsAdd(full);
-    inMemoryOps.push(full);
-    derivedState = applyOp(derivedState, full);
+  let commandQueue = Promise.resolve();
+  function enqueue(task){
+    const result = commandQueue.then(task);
+    commandQueue = result.catch(e => { $('#save-status').textContent = e.message; render(); });
+    return result.catch(() => null);
+  }
+
+  function adopt(ops){
+    if (ops.map(o => o.id).join() !== inMemoryOps.map(o => o.id).join()) {
+      undoStack = []; redoStack = [];
+    }
+    inMemoryOps = ops;
+    derivedState = reduceAll(ops);
+  }
+
+  function commit(op, recordHistory=true){
+    return enqueue(() => persist(op, recordHistory));
+  }
+
+  async function persist(op, recordHistory=true){
+    const db = await dbOpen();
+    let full, latest, nextState, problem;
+    // Read, validate, compute the inverse and append inside ONE readwrite transaction.
+    // IndexedDB serializes overlapping writers, including writers in other tabs.
+    await new Promise((resolve, reject) => {
+      const t = db.transaction(STORE_OPS, 'readwrite');
+      const store = t.objectStore(STORE_OPS);
+      t.oncomplete = resolve;
+      t.onabort = t.onerror = () => reject(problem || t.error || new Error('Save aborted.'));
+      store.getAll().onsuccess = e => {
+        try {
+          latest = e.target.result.sort((a,b) => a.ts.localeCompare(b.ts) || a.id.localeCompare(b.id));
+          const previousHead = inMemoryOps.at(-1)?.id;
+          adopt(latest);
+          if (op.inverseOf && previousHead !== latest.at(-1)?.id) throw new Error('Undo history cleared: another tab changed this document.');
+          const p = op.payload;
+          if (op.type !== 'add_item') {
+            if (!derivedState.items[p.id]) throw new Error('This item was removed in another tab. Copy your draft before pressing Escape.');
+            const section = Object.keys(derivedState.sections).find(s => derivedState.sections[s].includes(p.id));
+            if (op.type === 'move_item') p.fromSection = section;
+            if (op.type === 'remove_item') p.section = section;
+          }
+          if (op.expectedHTML !== undefined && derivedState.items[p.id]?.html !== op.expectedHTML) throw new Error('Save conflict: another tab edited this item. Your draft is preserved; copy it, then Escape to view the saved version.');
+          if (op.type === 'add_item' && derivedState.items[p.item.id]) throw new Error('Item already exists.');
+          const inverse = inverses[op.type]?.(op, derivedState);
+          const ts = new Date(Math.max(Date.now(), (Date.parse(latest.at(-1)?.ts) || 0) + 1)).toISOString();
+          full = { id: uuid(), ts, type: op.type, payload: p, inverse: inverse || null };
+          if (op.inverseOf) full.inverseOf = op.inverseOf;
+          nextState = applyOp(derivedState, full);
+          store.add(full);
+        } catch (e) { problem = e; t.abort(); }
+      };
+    });
+    inMemoryOps = [...latest, full];
+    derivedState = nextState;
     if (recordHistory) { undoStack.push(full.id); redoStack = []; }
+    $('#save-status').textContent = 'Saved locally. No remote synchronization.';
     render();
     await notifyPeers();
     return full;
@@ -379,17 +447,29 @@
   }
 
   function startEdit(node){
+    if (activeEdit) return;
     const content = $('.content', node);
-    const id = node.dataset.id; const section = node.dataset.section;
+    const id = node.dataset.id;
+    const expectedHTML = derivedState.items[id]?.html;
+    activeEdit = node;
+    node.draggable = false;
     content.setAttribute('contenteditable', 'true'); content.focus();
+    $('#save-status').textContent = 'Editing an unsaved draft. Ctrl/Cmd+Enter saves; Escape cancels.';
     const sel = window.getSelection(); sel?.selectAllChildren(content); sel?.collapseToEnd();
-
-    function finish(cancel){
+    let saving = false;
+    async function finish(cancel){
+      if (saving) return;
+      if (!cancel) {
+        saving = true;
+        const saved = await commit({ type: 'update_item', payload: { id, html: safeHTML(content.innerHTML) }, expectedHTML });
+        saving = false;
+        if (!saved) return;
+      }
       content.removeEventListener('keydown', onKey);
       content.removeEventListener('blur', onBlur);
-      content.setAttribute('contenteditable', 'false');
-      if (!cancel){ const html = safeHTML(content.innerHTML); commit({ type: 'update_item', payload: { id, html } }); }
-      else { content.innerHTML = safeHTML(derivedState.items[id].html); }
+      activeEdit = null;
+      render();
+      if (cancel) $('#save-status').textContent = 'Draft cancelled. Showing the latest saved state.';
     }
     function onKey(e){
       if (e.key === 'Escape') { e.preventDefault(); finish(true); }
@@ -400,22 +480,22 @@
     content.addEventListener('blur', onBlur);
   }
 
-  // ---------- Undo / Redo (compensating ops) ----------
-  async function undo(){
-    const lastId = undoStack.pop(); if (!lastId) return;
-    const op = inMemoryOps.find(o=>o.id===lastId);
-    if (!op || !op.inverse) return;
-    const inv = { type: op.inverse.type, payload: op.inverse.payload, inverseOf: op.id };
-    redoStack.push(op.id);
-    await commit(inv, false);
+  // ---------- Undo / Redo (session-only compensating ops) ----------
+  function undo(){
+    return enqueue(async () => {
+      const id = undoStack.at(-1), op = inMemoryOps.find(o => o.id === id);
+      if (!op?.inverse) return;
+      await persist({ ...clone(op.inverse), inverseOf: id }, false);
+      undoStack.pop(); redoStack.push(id); render();
+    });
   }
-  async function redo(){
-    const id = redoStack.pop(); if (!id) return;
-    const op = inMemoryOps.find(o=>o.id===id);
-    if (!op) return;
-    // re-apply original op as a new op (to keep timeline immutable)
-    undoStack.push(id);
-    await commit({ type: op.type, payload: op.payload, inverseOf: id }, false);
+  function redo(){
+    return enqueue(async () => {
+      const id = redoStack.at(-1), op = inMemoryOps.find(o => o.id === id);
+      if (!op) return;
+      const full = await persist({ type: op.type, payload: clone(op.payload), inverseOf: id }, false);
+      redoStack.pop(); undoStack.push(full.id); render();
+    });
   }
 
   // ---------- Import / Export / Reset ----------
@@ -425,14 +505,16 @@
     a.download = filename; a.click(); URL.revokeObjectURL(a.href);
   }
 
-  $('#export-btn').addEventListener('click', () => {
+  $('#export-btn').addEventListener('click', () => enqueue(async () => {
+    adopt(await opsAll());
     const dump = JSON.stringify({ ops: inMemoryOps }, null, 2);
     download('report-export.json', dump);
-  });
+    render();
+  }));
 
   $('#import-btn').addEventListener('click', async () => {
     const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json';
-    inp.onchange = async () => {
+    inp.onchange = () => enqueue(async () => {
       const file = inp.files[0]; if (!file) return;
       try {
         const data = JSON.parse(await file.text());
@@ -447,15 +529,15 @@
         inMemoryOps = data.ops; derivedState = state; undoStack = []; redoStack = [];
         render(); await notifyPeers();
       } catch (e) { alert('Import failed: ' + e.message); }
-    };
+    });
     inp.click();
   });
 
-  $('#clear-btn').addEventListener('click', async () => {
+  $('#clear-btn').addEventListener('click', () => enqueue(async () => {
     if (!confirm('Clear all data?')) return;
     await opsClear(); inMemoryOps = []; derivedState = emptyState(); undoStack = []; redoStack = [];
-    render();
-  });
+    render(); await notifyPeers();
+  }));
 
   // ---------- Timeline rendering ----------
   function renderTimeline(){
@@ -494,7 +576,7 @@
     let previous = '';
     let state = emptyState();
     for (const op of ops){
-      if (!op || !validId(op.id) || ids.has(op.id) || typeof op.ts !== 'string' || !Number.isFinite(Date.parse(op.ts)) || new Date(op.ts).toISOString() !== op.ts || op.ts < previous) throw new Error('Invalid operation ID or order.');
+      if (!op || !validId(op.id) || ids.has(op.id) || typeof op.ts !== 'string' || !Number.isFinite(Date.parse(op.ts)) || new Date(op.ts).toISOString() !== op.ts || op.ts <= previous) throw new Error('Invalid operation ID or order.');
       ids.add(op.id); previous = op.ts;
       if (!Object.hasOwn(reducers, op.type) || !op.payload || typeof op.payload !== 'object') throw new Error('Invalid operation.');
       const p = op.payload;
@@ -520,7 +602,7 @@
   // ---------- Global toolbar ----------
   $('#add-anywhere').addEventListener('click', () => {
     const sec = prompt('Add item to which section? header | main | aside | footer','main');
-    if (!sec || !(sec in derivedState.sections)) return;
+    if (!sec || !Object.hasOwn(derivedState.sections, sec)) return;
     addNew(sec);
   });
   $('#undo-btn').addEventListener('click', undo);
@@ -529,33 +611,39 @@
   $('#redo-last').addEventListener('click', redo);
 
   // ---------- Boot ----------
-  (async function init(){
-    await dbOpen();
-    inMemoryOps = await opsAll();
-    derivedState = reduceAll(inMemoryOps);
-    wireDropZones();
-    if (inMemoryOps.length === 0){
-      // seed some content
-      await commit({ type: 'add_item', payload: { section: 'header', item: { id: uuid(), html: '<h1>Quarterly Report</h1>' } } });
-      await commit({ type: 'add_item', payload: { section: 'main', item: { id: uuid(), html: '<p>Double‑click to edit me. Drag items between sections.</p>' } } });
-      await commit({ type: 'add_item', payload: { section: 'aside', item: { id: uuid(), html: '<ul><li>Task A</li><li>Task B</li></ul>' } } });
-      await commit({ type: 'add_item', payload: { section: 'footer', item: { id: uuid(), html: '<small>Confidential</small>' } } });
-    } else {
-      render();
-    }
-  })();
+  enqueue(async () => {
+    const db = await dbOpen();
+    await new Promise((resolve, reject) => {
+      const t = db.transaction([STORE_OPS, 'meta'], 'readwrite');
+      const store = t.objectStore(STORE_OPS), meta = t.objectStore('meta');
+      t.oncomplete = resolve; t.onabort = t.onerror = () => reject(t.error || new Error('Initialization failed.'));
+      meta.get('initialized').onsuccess = e => {
+        if (e.target.result) return;
+        meta.put(true, 'initialized');
+        store.getAll().onsuccess = e => {
+          if (e.target.result.length) return;
+          const seeds = { header: '<h1>Quarterly Report</h1>', main: '<p>Double-click to edit me. Move items with the buttons or drag.</p>', aside: '<ul><li>Task A</li><li>Task B</li></ul>', footer: '<small>Confidential</small>' };
+          let ts = Date.now();
+          for (const [section, html] of Object.entries(seeds)) store.add({ id: uuid(), ts: new Date(ts++).toISOString(), type: 'add_item', payload: { section, item: { id: uuid(), html } } });
+        };
+      };
+    });
+    adopt(await opsAll()); wireDropZones(); render(); await notifyPeers();
+  });
 
-  // ---------- Future hooks (nanostores / sync) ----------
-  // The event log is append-only. For multi-tab sync, you could:
-  // - Listen to IDB change via periodic polling (or BroadcastChannel) and re-read opsAll().
-  // - Maintain last seen op ts in localStorage; on visibilitychange, refresh.
-  // - For multi-user, stream ops over WebSocket and merge by ts/uuid (or use CRDT like Yjs in place of simple ops).
-
-  // Bonus: BroadcastChannel for multi-tab live updates (local only)
+  // Same-origin, same-browser synchronization. Remote collaboration needs a server
+  // and a conflict-resolution protocol; timestamps alone are not a network merge strategy.
   const bc = ('BroadcastChannel' in self) ? new BroadcastChannel('rich-editor-mvp') : null;
   bc?.addEventListener('message', async (e) => {
-    if (e.data === 'refresh'){ inMemoryOps = await opsAll(); derivedState = reduceAll(inMemoryOps); render(); }
+    if (e.data === 'refresh') refreshPeers();
   });
+  function refreshPeers(){
+    return enqueue(async () => {
+      adopt(await opsAll()); render();
+      $('#save-status').textContent = activeEdit ? 'Peer changes received. Your unsaved draft and selection are preserved.' : 'Latest local document loaded.';
+    });
+  }
+  window.addEventListener('focus', refreshPeers);
   async function notifyPeers(){ bc?.postMessage('refresh'); }
 
 })();

@@ -2,9 +2,11 @@
 
 **A living web-platform reference, in one HTML file.**
 
-![one.html in light mode: a numbered section index, capability search, and live Modern CSS examples beside their source.](docs/screenshot.jpg)
+**[Open the live demo](https://chriswhawkins.github.io/one.html/)** · [Surface lab](https://chriswhawkins.github.io/one.html/proofs/) · [Runtime lab](https://chriswhawkins.github.io/one.html/proofs/runtime.html)
 
-*The Modern CSS section, running in a browser. The examples and detection results are live.*
+![one.html pattern explorer in light mode, with agent setup, an optional project goal, and categorized interactive examples.](docs/screenshot.jpg)
+
+*Start with a pattern, try it in the browser, then copy an instruction for your agent.*
 
 This started as a long-running kitchen sink for the web platform: HTML, CSS, JavaScript, browser APIs, hardware access, storage, graphics, AI, accessibility, and whatever comes next.
 
@@ -14,11 +16,11 @@ It’s not intended to be a framework, component library, or canonical implement
 
 ## Browse the reference
 
-- Use the numbered index to jump between sections. On smaller screens, open **Browse sections**.
-- Search for a capability such as `dialog`, `clipboard`, or `storage`. Press `/` to focus search and `Escape` to clear it. Choosing a section restores the full collection.
-- Try the live controls. The `:has()` and container-query examples show CSS excerpts read from this file’s stylesheet, with implementation notes underneath.
-- Share a section’s URL, or use the `#` permalinks beside the two CSS examples above.
-- Open **Browser details** for detection results and **Console** for messages from the examples. The **Light / Dark** control changes the page’s color scheme.
+- Start in **Explore patterns**: 25 selected patterns grouped by what you want to build. Search or choose a category to narrow them down.
+- Select **Try pattern** for a focused demonstration. The full reference keeps the older examples and their source available.
+- Add your goal and select **Copy agent prompt** to carry the pattern, source pointers, requirements and verification steps into your agent.
+- Use **Surface lab** for complete portability, collaboration and rendering proofs; use **Runtime lab** for SQLite, Python and transport experiments.
+- Browse the numbered sections for the full platform reference. Press `/` to search, `Escape` to clear, and open **Browser details** or **Console** for detection and example output.
 
 ## Run it
 
@@ -40,11 +42,35 @@ Storage examples read and modify this origin’s browser storage. Use a dedicate
 - [`AGENTS.md`](AGENTS.md): guidance for working on this repository.
 - [`skills/browser-native-spike/SKILL.md`](skills/browser-native-spike/SKILL.md): reusable guidance for building browser-native prototypes elsewhere.
 
+## Work through complete proofs
+
+Open the [Surface lab](proofs/index.html) for editable HTML export, real WebRTC peer sessions, versioned agent commands, streamed HTML, HTML-in-Canvas and codec/device checks. It is linked from the pattern explorer and retains per-proof agent prompts. The [runtime lab](proofs/runtime.html) adds worker-based SQLite/Python and transport measurements.
+
+Optional pairing, streaming and WebSocket echo use `python3 proofs/server.py --port 8765`, then open [localhost:8765/proofs/](http://localhost:8765/proofs/). See [requirements and verified limits](proofs/README.md). The [roadmap](docs/next-proofs.md) tracks experiments that need physical devices, external infrastructure or installed browser capabilities.
+
 ## Use it with an agent
 
-Point your agent at `index.html` and describe the interaction you want to explore. Ask for a working, inspectable prototype using the browser platform before adding dependencies.
+On the live demo, select **Copy setup instruction** and paste it into your agent once. It installs the reusable `browser-native-spike` skill globally. Then choose an example and copy its agent prompt.
 
-The `browser-native-spike` skill can be copied as a folder into your agent’s supported skills directory without cloning the rest of this repository. It consults the current [main artifact](https://raw.githubusercontent.com/chriswhawkins/one.html/main/index.html), keeping examples out of the skill itself. A local checkout or commit-pinned copy also works when offline or when reproducibility matters.
+If you prefer the terminal, with Node.js installed:
+
+```sh
+npx skills add chriswhawkins/one.html --skill browser-native-spike --global
+```
+
+Choose your agent when prompted. You can also copy [`skills/browser-native-spike/`](skills/browser-native-spike/) into your agent’s supported skills directory manually. The skill consults the current reference instead of duplicating its examples. A local checkout or commit-pinned copy works for offline use and reproducibility.
+
+## Live hosting
+
+The demo uses **GitHub Pages**, publishing the root of `main`. Merged changes publish automatically; `.nojekyll` keeps the HTML and support files unchanged. No build step, runtime server, deployment token or paid service is required. See [GitHub Pages setup](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site).
+
+| Available on the public demo | Requires another environment |
+| --- | --- |
+| Reference, editor, portable HTML export/import, manual WebRTC pairing and local command inspector | Link-based pairing, delayed HTML streaming and the bundled WebSocket echo need `proofs/server.py`. |
+| SQLite/Python workers, OPFS snapshots and codec checks in supporting browsers | Runtime packages download from their pinned CDNs. WebTransport needs a supplied endpoint. |
+| Feature detection and ordinary DOM fallbacks | Native WebMCP and HTML-in-Canvas need a compatible experimental browser. Screen capture and hardware APIs need support and permission; cross-network peers may need STUN/TURN. |
+
+The hosted demo is a static reference, not a hosted collaboration backend. [Verification results and device limits](proofs/README.md) distinguish tested behavior from follow-on experiments.
 
 ## Keep it small
 

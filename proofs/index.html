@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<title>Surface lab · one.html</title>
+<link rel="icon" href="data:,">
+<style>
+:root{color-scheme:light dark;--bg:#f4f4f0;--paper:#fff;--ink:#182322;--muted:#53615e;--line:#c3cbc7;--accent:#126549;--soft:#e8f2ed;--mono:ui-monospace,SFMono-Regular,Consolas,monospace}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}button,input,select,textarea{font:inherit;color:inherit}button,.button{border:1px solid var(--ink);border-radius:3px;padding:8px 12px;background:var(--paper);cursor:pointer;text-decoration:none;display:inline-block}button:hover,.button:hover{background:var(--soft)}button:disabled{opacity:.45;cursor:default}button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}input,select,textarea{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:8px;max-width:100%}textarea{width:100%;resize:vertical}label{display:block;font-size:14px}label input:not([type=checkbox]),label textarea{display:block;width:100%;margin-top:5px}input[type=checkbox]{width:auto}a{color:var(--accent)}:focus-visible{outline:3px solid #db8100;outline-offset:3px}h1{font-size:30px;letter-spacing:-1px;margin:0}h2{font-size:24px;margin:0 0 12px}h3{font-size:18px;margin:0 0 10px}p{margin:8px 0 16px}small,.note{font-size:13px;color:var(--muted)}header{padding:22px 28px;border-bottom:1px solid var(--ink);display:flex;align-items:center;justify-content:space-between;gap:20px}nav{display:flex;gap:5px;padding:12px 28px;overflow:auto;border-bottom:1px solid var(--line)}nav a{padding:8px 12px;text-decoration:none;white-space:nowrap;color:var(--ink);font-size:14px}nav a[aria-current]{background:var(--ink);color:var(--paper)}main{padding:24px 28px;max-width:1440px;margin:auto}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>*{min-width:0}.split{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px}.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}.panel{background:var(--paper);border:1px solid var(--line);padding:20px;margin-bottom:20px;min-width:0}.kicker{font:12px var(--mono);text-transform:uppercase;letter-spacing:1.3px;color:var(--muted);margin:0 0 8px}.status{font:13px/1.6 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere;margin-top:12px;min-height:22px}.tag{font:12px var(--mono);border:1px solid var(--line);padding:4px 7px}.toolbar{margin:12px 0}.board{position:relative;aspect-ratio:5/3;width:100%;overflow:hidden;background:#f9fbfa;background-image:radial-gradient(#cbd5ce 1px,transparent 1px);background-size:20px 20px;border:1px solid var(--ink);color:#182322}.card{position:absolute;width:24%;min-height:22%;border:1px solid #53615e;border-radius:3px;padding:10px;background:#fff0bb;box-shadow:2px 3px 0 #18232218;overflow:hidden}.card[data-selected=true]{outline:3px solid #126549;outline-offset:2px}.card p{white-space:pre-wrap;margin:0;font-size:clamp(11px,1.3vw,17px);overflow-wrap:anywhere}.card img{width:100%;max-height:110px;object-fit:contain;display:block}.handle{display:block;font-size:12px;line-height:1;padding:5px 0;margin-bottom:6px;cursor:grab;touch-action:none;border:0;background:transparent;color:#30403a}.ink{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.board.drawing .ink{pointer-events:auto;touch-action:none}.peer-cursor{position:absolute;pointer-events:none;z-index:4;background:#6732ad;color:white;padding:2px 7px;border-radius:12px;font-size:12px}.inspector{align-self:start}.inspector>.note,.inspector>label:has(#image-file){grid-column:1/-1}.card{height:25%;display:flex;flex-direction:column}.card p{min-height:0;overflow:auto;flex:1}.handle{flex-shrink:0;min-height:0}.card img{flex-shrink:0;height:45%;object-fit:contain}.inspector label{margin-bottom:14px}.inspector .row button{flex:1}.metrics{display:flex;gap:24px;flex-wrap:wrap;margin:12px 0}.metrics strong{display:block;font:22px var(--mono)}details{margin:14px 0}summary{cursor:pointer;font-weight:600}code,pre{font:13px/1.6 var(--mono)}code{overflow-wrap:anywhere}pre{overflow:auto;background:var(--bg);padding:12px;max-height:360px}video,canvas.preview,iframe{width:100%;max-width:100%;background:#e9eeeb;border:1px solid var(--line)}video{max-height:360px}iframe{min-height:230px}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}dialog{width:min(700px,94vw);background:var(--paper);color:var(--ink);border:1px solid var(--ink);padding:22px}dialog::backdrop{background:#0008}[hidden]{display:none!important}.warning{color:#a33b1b}footer{padding:20px 28px;font-size:13px;color:var(--muted)}.section-head{display:flex;justify-content:space-between;align-items:start;gap:16px;margin-bottom:18px}.range{width:100%}
+@media(prefers-color-scheme:dark){:root{--bg:#161c1a;--paper:#202925;--ink:#e4ede8;--muted:#a0b4aa;--line:#4b5c52;--accent:#74d4af;--soft:#2a4437}button.primary{color:#12271e}video,canvas.preview,iframe{background:#fff}.warning{color:#ffad8a}}
+@media(max-width:800px){header{padding:16px;align-items:start}header .tag{display:none}nav{padding:8px}main{padding:16px}.split,.two{grid-template-columns:1fr}.panel{padding:15px}.board{aspect-ratio:5/4}.card{padding:6px}.card p{font-size:12px}.card img{max-height:65px}.handle{font-size:10px;min-height:0}.section-head{flex-wrap:wrap}h1{font-size:25px}.inspector{display:grid;grid-template-columns:1fr 1fr;gap:10px}.inspector>h3,.inspector>.status,.inspector>.row{grid-column:1/-1}button,.button{min-height:42px}}
+</style>
+</head>
+<body>
+<header><div><p class="kicker">one.html / Working proofs</p><h1>Surface lab</h1></div><div class="row"><span class="tag">No build · inspectable source</span><a href="../index.html#patterns">← Reference</a></div></header>
+<nav aria-label="Proofs"><a href="#surface">01 Portable surface</a><a href="#connect">02 Share & control</a><a href="#agents">03 Agent commands</a><a href="#render">04 HTML & canvas</a><a href="#measure">05 Codec & mobile</a></nav>
+<main>
+<section id="surface" class="view">
+<div class="section-head"><div><p class="kicker">Create → package → reopen</p><h2>A surface you can take with you.</h2><p>Move a card by its handle, edit its text, or draw. Export one HTML file and keep working offline.</p></div><button data-prompt="surface">Copy agent prompt</button></div>
+<div class="split"><div><div class="row toolbar"><button id="add-card">Add card</button><label><input id="draw-mode" type="checkbox"> Draw with pen / touch</label><button id="undo" disabled>Undo</button><button id="redo" disabled>Redo</button><span id="revision" class="tag"></span></div>
+<div id="board" class="board" role="region" aria-label="Shared surface"><div id="cards"></div><canvas id="ink" class="ink" width="800" height="480" aria-label="Ink annotation layer"></canvas><span id="peer-cursor" class="peer-cursor" hidden>Peer</span></div>
+<p class="note">Focus a card’s move handle and use arrow keys. Drawing uses pressure when available. Coordinates stay fixed to an 800 × 480 surface. Select a card to read its full text in the editor.</p>
+<div class="row"><button id="export-html" class="primary">Export HTML</button><button id="export-json">Export state</button><label class="button">Import HTML / JSON<input id="import-file" type="file" accept=".html,.json" hidden></label><button id="roundtrip">Check round trip</button></div>
+<div id="surface-status" class="status" role="status"></div>
+<details><summary>Replay & fork this session</summary><p class="note">The latest 40 committed states are kept in memory. Replaying is read-only; fork to continue from a chosen state.</p><label>Recorded state <input id="replay" type="range" min="0" max="0" value="0" class="range"></label><div class="row"><button id="live">Return to live</button><button id="fork">Fork selected state</button><span id="replay-label"></span></div></details>
+</div><aside class="panel inspector"><h3>Selected card</h3><label>Text<textarea id="card-text" rows="5" maxlength="1000"></textarea></label><label>Color<select id="card-color"><option value="#fff0bb">Yellow</option><option value="#d6ecdf">Green</option><option value="#dce8ff">Blue</option><option value="#f7dcdf">Pink</option></select></label><div class="row"><button id="apply" class="primary">Apply edit</button><button id="discard">Reload draft</button></div><label>Add image<input id="image-file" type="file" accept="image/png,image/jpeg,image/webp"></label><div class="row"><button id="delete-card">Delete card</button><button id="clear-ink">Clear ink</button></div><p id="draft-status" class="status" role="status"></p><p class="note">Imports load validated text, image pixels, geometry and strokes. Imported scripts are never run. Undo is session-local; peer edits clear it.</p></aside></div>
+</section>
+<section id="connect" class="view" hidden>
+<div class="section-head"><div><p class="kicker">Real peers / WebRTC</p><h2>Share the surface, then hand over control.</h2><p>The host owns the state. The peer starts as a viewer; the host can grant and revoke editing.</p></div><button data-prompt="connect">Copy agent prompt</button></div>
+<div class="two"><div class="panel"><h3>Pair two browsers</h3><p id="server-status" class="note">Checking optional pairing server…</p><div class="row"><button id="host" class="primary">Create session</button><button id="disconnect">Disconnect</button></div><label>Session link<input id="session-link" readonly placeholder="Create a session to get a peer link"></label><div class="row toolbar"><button id="copy-link">Copy link</button><button id="join">Join from link</button></div><label>Paste a session link<input id="join-link" placeholder="https://your-host/proofs/#join=…"></label><label><input id="allow-control" type="checkbox"> Allow the connected peer to edit</label><p id="connection-status" class="status" role="status">Standalone. No connection.</p><p id="connection-metrics" class="status"></p>
+<details><summary>Manual signaling / TURN settings</summary><p class="note">Manual offer/answer exchange works without the pairing server. STUN/TURN settings are optional and stay in memory. Different networks often need TURN. No public server is contacted by default.</p><label>ICE servers (JSON)<textarea id="ice-servers" rows="3" spellcheck="false">[]</textarea></label><div class="row toolbar"><button id="make-offer">Create offer</button><button id="make-answer">Answer pasted offer</button><button id="accept-answer">Accept pasted answer</button></div><label>Incoming offer / answer<textarea id="signal-in" rows="3" spellcheck="false"></textarea></label><label>Outgoing offer / answer<textarea id="signal-out" rows="3" readonly></textarea></label><button id="copy-signal">Copy outgoing</button></details>
+</div><div class="panel"><h3>Screen, camera & remote annotations</h3><p class="note">Share a chosen screen/tab or camera over the peer connection. The receiver can point at the video. Screen capture and captured-tab controls depend on browser permissions and support.</p><div class="row"><button id="share-screen">Share screen</button><button id="share-camera">Share camera</button><button id="stop-media">Stop media</button><label><input id="include-audio" type="checkbox"> Include available audio</label></div><label>Video preview<select id="video-source"><option value="local">My capture</option><option value="remote">Peer video</option></select></label><div style="position:relative"><video id="shared-video" autoplay playsinline muted controls></video><span id="video-pointer" class="peer-cursor" hidden>Peer</span></div><div class="row toolbar"><button id="video-play">Play received video</button><button id="video-sound">Enable received sound</button><button id="zoom-in">Zoom captured tab +</button><button id="zoom-out">Zoom captured tab −</button><label><input id="forward-wheel" type="checkbox"> Scroll captured tab here</label></div><p id="media-status" class="status" role="status">No media active. Pointing is available to viewers; editing permission applies to the surface.</p></div></div>
+<p class="note">For phone pairing, serve with HTTPS reachable from both devices. The included Python helper provides short-lived signaling and streamed HTML; it is a development server. An exported file retains manual WebRTC pairing but has no server endpoint.</p>
+<pre>python3 proofs/server.py --port 8765
+# LAN with your trusted certificate:
+python3 proofs/server.py --bind 0.0.0.0 --port 8443 --cert /path/cert.pem --key /path/key.pem</pre>
+</section>
+<section id="agents" class="view" hidden>
+<div class="section-head"><div><p class="kicker">One command path / human + agent</p><h2>Make the surface callable.</h2><p>Inspect state, propose a change, then apply it against a known revision.</p></div><button data-prompt="agents">Copy agent prompt</button></div>
+<div class="two"><div class="panel"><h3>Command inspector</h3><label>Tool<select id="tool-name"><option>get_surface</option><option>propose_edit</option><option>apply_edit</option></select></label><label>Arguments (JSON)<textarea id="tool-args" rows="9" spellcheck="false">{}</textarea></label><button id="run-tool" class="primary">Run tool</button><pre id="tool-output" role="status">Ready.</pre></div><div class="panel"><h3>Native WebMCP</h3><p id="mcp-status" class="status"></p><p>When available, this page registers the same tools with <code>document.modelContext</code>. Local command execution verifies application behavior; agent discovery needs a compatible browser client.</p><p><a href="https://developer.chrome.com/docs/ai/webmcp">WebMCP setup ↗</a></p><h3>Try a conflict</h3><p>Propose an edit, change a card, then apply the old proposal. The old revision should be rejected while your new work stays intact.</p><button id="conflict-check">Run disposable conflict check</button><p id="conflict-result" class="status" role="status"></p></div></div>
+</section>
+<section id="render" class="view" hidden>
+<div class="section-head"><div><p class="kicker">HTML as an update / HTML as pixels</p><h2>Keep the content useful as it moves.</h2></div><button data-prompt="render">Copy agent prompt</button></div>
+<div class="two"><div class="panel"><h3>Stream HTML out of order</h3><p>The helper server sends the shell first, then fills named regions. Type into the draft inside the frame while the fragments arrive.</p><div class="row"><button id="stream-start">Start native stream</button><button id="stream-stop">Interrupt stream</button><button id="patch-fixture">Test native parser</button></div><iframe id="stream-frame" title="Streaming HTML with an independent draft" sandbox="allow-same-origin"></iframe><p id="stream-status" class="status" role="status">Native path only. Requires server.py for delayed network delivery.</p><details><summary>Inspect the format</summary><pre>&lt;div&gt;&lt;?marker name="report"&gt;&lt;/div&gt;
+&lt;template for="report"&gt;A completed section&lt;/template&gt;</pre><p>Replacement does not merge an active editor’s state. This proof updates regions beside the draft.</p></details></div>
+<div class="panel"><h3>Live HTML inside canvas</h3><p>Draw a real form into a rotated canvas. Try selecting the text and editing the field after rendering.</p><div class="row"><button id="draw-html">Start HTML-in-Canvas</button><button id="html-png">Export canvas PNG</button></div><canvas id="html-canvas" class="preview" width="640" height="300" layoutsubtree style="position:relative;aspect-ratio:640/300;min-height:320px"><div id="html-source" drawable style="width:640px;height:300px;transform-origin:0 0"><form id="drawable-form" style="position:absolute;left:40px;top:70px;transform-origin:0 0;width:min(260px,calc(100% - 80px));padding:16px;background:white;color:#172923"><p>Selectable HTML · مرحبًا · 日本語</p><label>Live field<input value="Edit me inside the canvas"></label></form></div></canvas><div id="html-fallback"><label>Ordinary DOM comparison<input value="Edit me outside the canvas"></label></div><label>Rotation <input id="html-angle" type="range" min="-20" max="20" value="8"></label><p id="html-status" class="status" role="status"></p><p class="note">Experimental Chromium flag: <code>canvas-draw-element</code>. This owned form contains no cross-origin resources.</p><details><summary>Compare a WebGL texture</summary><p>The same kind of HTML form, rendered through a GPU shader with matching pointer geometry.</p><div class="row"><button id="gpu-html-start">Start WebGL form</button><button id="gpu-html-png">Export WebGL PNG</button></div><canvas id="gpu-html" class="preview" width="640" height="300" layoutsubtree style="position:relative;aspect-ratio:640/300;min-height:320px"><div id="gpu-source" drawable style="width:640px;height:300px;transform-origin:0 0"><form id="gpu-form" style="position:absolute;left:40px;top:70px;width:min(260px,calc(100% - 80px));padding:16px;background:white;color:#172923;transform-origin:0 0"><p>HTML on a GPU texture</p><label>GPU field<input value="Still an HTML input"></label></form></div></canvas><label>GPU rotation<input id="gpu-angle" type="range" min="-20" max="20" value="12"></label><p id="gpu-status" class="status" role="status">Not started. Requires the experimental element-texture API.</p></details></div></div>
+</section>
+<section id="measure" class="view" hidden>
+<div class="section-head"><div><p class="kicker">Measure the task / test the device</p><h2>What survives—and what does it cost?</h2></div><button data-prompt="measure">Copy agent prompt</button></div>
+<div class="two"><div class="panel"><h3>State, pixels & an actual codec</h3><p>Render the surface, measure a portable HTML file and PNG, then encode and decode 30 generated frames with WebCodecs.</p><div class="row"><button id="measure-state">Measure artifact & PNG</button><button id="run-codec">Encode → decode</button><button id="cancel-codec">Cancel codec</button></div><canvas id="codec-canvas" class="preview" width="800" height="480"></canvas><pre id="codec-status" role="status">Nothing measured yet.</pre><p class="note">The raster renderer approximates card layout and wraps text. PNG/video preserve pixels; the HTML artifact retains editing. Sizes are not equivalent-information compression ratios. Encoded bytes exclude a media container.</p><button id="save-png">Download rendered PNG</button></div>
+<div class="panel"><h3>Mobile lifecycle & persistence</h3><p id="device-status" class="status"></p><div class="row"><button id="wake">Keep screen awake</button><button id="release-wake">Release wake lock</button><button id="share-file">Share HTML file</button><button id="export-evidence">Export test evidence</button></div><div id="device-checks"></div><pre id="lifecycle-log" role="log" aria-label="Recent lifecycle events"></pre><p class="note">Manual checks record your observation, browser and time. A desktop viewport does not establish Pencil, touch, suspension or recovery behavior.</p></div></div>
+<details class="panel"><summary>Further protocols & installed runtimes</summary><p><a class="button" href="runtime.html">Open runtime & transport lab →</a></p><p>These follow-on experiments need infrastructure or a runtime beyond this file. Their requirements and acceptance tests are in the <a href="../docs/next-proofs.md">roadmap</a>.</p><table><tr><th>Experiment</th><th>Required boundary</th></tr><tr><td>WebTransport / Media over QUIC</td><td>Compatible relay; measure congestion and end-to-end media delivery.</td></tr><tr><td>MQTT / WebTorrent</td><td>Broker or available WebRTC peers and a client library.</td></tr><tr><td>SQLite / Python via WASM</td><td>Runtime assets and a worker; measure cold start, memory and cancellation.</td></tr><tr><td>Controlled Frame / Direct Sockets</td><td>Installed Isolated Web App and permissions; unavailable to ordinary tabs.</td></tr></table></details>
+</section>
+</main>
+<footer><span id="save-status" role="status"></span> <span id="global-status" role="status"></span><p>Source: this HTML file. Optional support: <a href="server.py">server.py</a>. <a href="README.md">Requirements & verification</a>.</p></footer>
+<dialog id="text-dialog"><form method="dialog"><div class="row"><h2 id="dialog-title">Copy text</h2><button>Close</button></div></form><textarea id="dialog-text" rows="14" readonly></textarea><p class="note">Select and copy this text if clipboard access is unavailable.</p></dialog>
+<dialog id="import-dialog"><h2>Import this surface?</h2><p id="import-summary"></p><iframe id="import-preview" sandbox title="Validated import preview"></iframe><p>Only validated surface data is shown. No imported HTML or scripts execute. Import replaces this workspace; export your current work first if needed.</p><div class="row"><button id="confirm-import">Import surface</button><button id="cancel-import">Cancel</button></div></dialog>
+<script id="surface-data" type="application/json">null</script>
+<script>
+(() => {
+'use strict';
+const SOURCE = '<!doctype html>\n' + document.documentElement.outerHTML;
+const $ = id => document.getElementById(id), clone = value => JSON.parse(JSON.stringify(value));
+const uid = () => crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2,'0')).join('');
+const colors = ['#fff0bb','#d6ecdf','#dce8ff','#f7dcdf'];
+const bytes = value => new TextEncoder().encode(typeof value === 'string' ? value : JSON.stringify(value)).length;
+const safeJSON = value => JSON.stringify(value).replace(/</g,'\\u003c');
+const escapeHTML = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const bounded = (n,low,high) => typeof n === 'number' && Number.isFinite(n) && n >= low && n <= high;
+function assert(ok, message){ if(!ok) throw new Error(message); }
+function validate(value){
+  assert(value && value.format === 'one.surface' && value.schema === 1, 'Not a supported surface (schema 1 required).');
+  assert(typeof value.id === 'string' && value.id.length <= 80 && typeof value.title === 'string' && value.title.length <= 200, 'Invalid document identity.');
+  assert(Number.isSafeInteger(value.revision) && value.revision >= 0, 'Invalid revision.');
+  assert(Array.isArray(value.cards) && value.cards.length <= 30 && Array.isArray(value.strokes) && value.strokes.length <= 100, 'Limit: 30 cards and 100 strokes.');
+  const ids = new Set();
+  const cards = value.cards.map(c => {
+    assert(c && typeof c.id === 'string' && c.id.length <= 80 && !ids.has(c.id), 'Invalid or duplicate card ID.'); ids.add(c.id);
+    assert(typeof c.text === 'string' && c.text.length <= 1000 && colors.includes(c.color), 'Invalid card text or color.');
+    assert(bounded(c.x,0,608) && bounded(c.y,0,360), 'Card position is outside the surface.');
+    assert(typeof c.image === 'string' && (c.image === '' || /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/]+=*$/.test(c.image)) && c.image.length <= 350000, 'Only small inline PNG/JPEG/WebP images are accepted.');
+    return {id:c.id,text:c.text,x:c.x,y:c.y,color:c.color,image:c.image};
+  });
+  const strokes = value.strokes.map(s => {
+    assert(s && typeof s.id === 'string' && s.id.length <= 80 && Array.isArray(s.points) && s.points.length > 0 && s.points.length <= 1200, 'Invalid stroke.');
+    return {id:s.id,points:s.points.map(p => { assert(Array.isArray(p) && p.length === 3 && bounded(p[0],0,800) && bounded(p[1],0,480) && bounded(p[2],0,1), 'Invalid stroke point.'); return p.slice(); })};
+  });
+  const provenance = {source:typeof value.provenance?.source === 'string' ? value.provenance.source.slice(0,500) : '', fidelity:'semantic', capabilities:['read','edit','move','annotate','export']};
+  const result = {format:'one.surface',schema:1,id:value.id,title:value.title,revision:value.revision,cards,strokes,provenance};
+  assert(bytes(result) <= 1500000, 'Surface exceeds the 1.5 MB state limit.');
+  return result;
+}
+function initial(){return {format:'one.surface',schema:1,id:uid(),title:'A portable surface',revision:0,cards:[{id:uid(),text:'Take this with you.\nExport → reopen → edit.',x:60,y:65,color:colors[0],image:''},{id:uid(),text:'Share a real session.\nA phone can join as a viewer.',x:330,y:170,color:colors[1],image:''}],strokes:[],provenance:{source:location.protocol==='file:'?'Exported HTML':location.origin+location.pathname,fidelity:'semantic',capabilities:['read','edit','move','annotate','export']}};}
+let state, storageKey;
+try { state = validate(JSON.parse($('surface-data').textContent) || initial()); } catch(e){ state = initial(); $('surface-status').textContent = 'Embedded state rejected: '+e.message; }
+try {
+  let slot = sessionStorage.getItem('one.proof.slot'); if(!slot || window.opener){slot=uid();sessionStorage.setItem('one.proof.slot',slot);window.opener=null;}
+  storageKey = 'one.proof.v1:'+slot+':'+location.pathname;
+  const saved = JSON.parse(localStorage.getItem(storageKey));
+  if(saved && (!$('surface-data').textContent.trim().startsWith('{') || saved.id === state.id && saved.revision >= state.revision)) state = validate(saved);
+} catch(e){ $('save-status').textContent = 'Local recovery unavailable. Export to keep your work.'; }
+let selected = state.cards[0]?.id, draftRevision=state.revision, dirty=false, undo=[],redo=[],timeline=[{label:'Opened',state:clone(state)}], replayIndex=null, importCandidate=null;
+let role='solo', pc=null, channel=null, presence=null, peerAllowed=false, serverAvailable=false, session=null, pollTimer=null, peerGeneration=0, pending=new Map(), handled=new Map(), sendQueue=[], sentBytes=0,receivedBytes=0, rtt=null;
+let localMedia=null, remoteMedia=null, remoteMediaActive=false, captureController=null, mediaGeneration=0, wakeLock=null;
+const evidence=[];
+function record(name,result,detail){evidence.push({name,result,detail,time:new Date().toISOString()}); if(evidence.length>100)evidence.shift();}
+function status(message,target='surface-status'){$(target).textContent=message;}
+function save(){try{if(!storageKey)throw Error();localStorage.setItem(storageKey,JSON.stringify(state));$('save-status').textContent='Saved locally · revision '+state.revision;}catch{$('save-status').textContent='Local save unavailable or full. Export to keep your work.';}}
+function saveDraft(){try{if(!storageKey)return;if(dirty)localStorage.setItem(storageKey+':draft',JSON.stringify({documentId:state.id,id:selected,revision:draftRevision,text:$('card-text').value,color:$('card-color').value}));else localStorage.removeItem(storageKey+':draft');}catch{status('Draft recovery unavailable. Apply and export to keep this edit.','draft-status');}}
+function recoverDraft(){try{const d=JSON.parse(localStorage.getItem(storageKey+':draft'));if(d && d.documentId===state.id && state.cards.some(c=>c.id===d.id) && Number.isSafeInteger(d.revision) && d.revision<=state.revision && typeof d.text==='string' && d.text.length<=1000 && colors.includes(d.color)){selected=d.id;draftRevision=d.revision;dirty=true;$('card-text').value=d.text;$('card-color').value=d.color;status('Recovered an unapplied draft. Apply it or reload the committed version.');}}catch{}}
+function shown(){return replayIndex===null?state:timeline[replayIndex].state;}
+function editable(){return replayIndex===null && (role!=='guest' || channel?.readyState==='open' && peerAllowed);}
+function draft(force=false){
+  const c=state.cards.find(c=>c.id===selected);
+  if(dirty && !force){$('draft-status').textContent=draftRevision===state.revision?'Unapplied draft.':'The surface changed. Your draft is intact; reload it before applying to the new revision.';return;}
+  $('card-text').value=c?.text||''; $('card-color').value=c?.color||colors[0]; draftRevision=state.revision;dirty=false;saveDraft();
+  $('draft-status').textContent=c?'Editing revision '+draftRevision:'Select a card or add one.';
+}
+function paintInk(ctx,strokes){ctx.clearRect(0,0,800,480);ctx.strokeStyle='#126549';ctx.fillStyle='#126549';ctx.lineCap='round';ctx.lineJoin='round';for(const stroke of strokes){const ps=stroke.points;for(let i=0;i<ps.length;i++){const p=ps[i],q=ps[Math.max(0,i-1)];ctx.lineWidth=1+5*p[2];ctx.beginPath();ctx.moveTo(q[0],q[1]);ctx.lineTo(p[0]+.01,p[1]+.01);ctx.stroke();}}}
+function render(){
+  const data=shown(), alive=new Set(data.cards.map(c=>c.id));
+  for(const el of $('cards').children)if(!alive.has(el.dataset.id))el.remove();
+  for(const c of data.cards){
+    let el=Array.from($('cards').children).find(el=>el.dataset.id===c.id);
+    if(!el){el=document.createElement('div');el.className='card';el.dataset.id=c.id;el.setAttribute('role','group');const handle=document.createElement('button');handle.className='handle';handle.textContent='⠿ Move / select';el.append(handle,document.createElement('img'),document.createElement('p'));$('cards').append(el);}
+    el.style.left=c.x/8+'%';el.style.top=c.y/4.8+'%';el.style.background=c.color;el.dataset.selected=String(c.id===selected);el.querySelector('.handle').setAttribute('aria-pressed',String(c.id===selected));el.querySelector('.handle').setAttribute('aria-label','Move card: '+c.text.slice(0,70));el.querySelector('p').textContent=c.text;
+    const img=el.querySelector('img');img.hidden=!c.image;if(c.image && img.getAttribute('src')!==c.image)img.src=c.image;if(!c.image)img.removeAttribute('src');img.alt='Attached image';
+  }
+  paintInk($('ink').getContext('2d'),data.strokes);
+  $('revision').textContent=(replayIndex===null?'Live':'Replay')+' · r'+data.revision;
+  for(const id of ['add-card','apply','delete-card','clear-ink','image-file','draw-mode'])$(id).disabled=!editable();
+  $('undo').disabled=!editable()||!undo.length||role==='guest';$('redo').disabled=!editable()||!redo.length||role==='guest';
+  $('export-html').disabled=false;$('confirm-import').disabled=role!=='solo';$('import-file').disabled=role!=='solo';
+  $('replay').max=timeline.length-1;$('replay').value=replayIndex??timeline.length-1;$('replay-label').textContent=timeline[replayIndex??timeline.length-1].label;
+  $('allow-control').disabled=role!=='host';$('fork').disabled=role!=='solo';draft();
+}
+function applyOperation(base,op,expected){
+  assert(expected===base.revision,'Stale revision. Reload the draft or propose again.');
+  assert(op && typeof op==='object','An operation is required.');
+  const next=clone(base), card=next.cards.find(c=>c.id===op.id);
+  if(op.type==='add')next.cards.push({id:op.id,text:op.text||'New card',x:op.x??90,y:op.y??90,color:colors[0],image:''});
+  else if(op.type==='edit'){assert(card,'Card no longer exists.');card.text=op.text;card.color=op.color??card.color;}
+  else if(op.type==='move'){assert(card,'Card no longer exists.');card.x=op.x;card.y=op.y;}
+  else if(op.type==='image'){assert(card,'Card no longer exists.');card.image=op.image;}
+  else if(op.type==='delete'){assert(card,'Card no longer exists.');next.cards=next.cards.filter(c=>c.id!==op.id);}
+  else if(op.type==='stroke')next.strokes.push(op.stroke);
+  else if(op.type==='clearInk')next.strokes=[];
+  else throw Error('Unknown operation.');
+  next.revision++;return validate(next);
+}
+function setState(next,label,remote=false){
+  state=validate(next);if(!state.cards.some(c=>c.id===selected)){selected=state.cards[0]?.id;dirty=false;}
+  if(remote){undo=[];redo=[];}timeline.push({label,state:clone(state)});if(timeline.length>40)timeline.shift();replayIndex=null;save();render();
+}
+function commit(op,expected=state.revision,remote=false){
+  assert(replayIndex===null,'Return to live before editing.');
+  const next=applyOperation(state,op,expected);if(!remote){undo.push(clone(state));if(undo.length>30)undo.shift();redo=[];}
+  setState(next,op.type,remote); if(role==='host')send({type:'state',state,allowed:peerAllowed});return {revision:state.revision};
+}
+async function command(op,expected=state.revision){
+  assert(editable(),'This surface is read-only. Ask the host for control or return to live.');
+  if(role!=='guest')return commit(op,expected);
+  assert(pending.size<4,'Wait for the host to acknowledge your previous changes.');
+  const id=uid();return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{pending.delete(id);reject(Error('Host did not acknowledge; check connection.'));},10000);pending.set(id,{resolve,reject,timer,start:performance.now()});try{send({type:'command',id,op,expected});}catch(e){clearTimeout(timer);pending.delete(id);reject(e);}});
+}
+function action(id,fn,target='surface-status'){$(id).onclick=async()=>{try{await fn();}catch(e){status(e.message,target);}};}
+$('card-text').oninput=$('card-color').onchange=()=>{dirty=true;draft();saveDraft();};
+action('add-card',async()=>{assert(!dirty,'Apply or reload your draft before adding another card.');const id=uid();await command({type:'add',id});selected=id;draft(true);render();});
+action('apply',async()=>{const op={type:'edit',id:selected,text:$('card-text').value,color:$('card-color').value};await command(op,draftRevision);dirty=false;draft(true);status('Edit applied.');});
+action('discard',()=>draft(true));action('delete-card',()=>command({type:'delete',id:selected}));action('clear-ink',()=>command({type:'clearInk'}));
+action('undo',()=>{assert(undo.length && role!=='guest','Nothing to undo here.');const prev=undo.pop();redo.push(clone(state));prev.revision=state.revision+1;setState(prev,'Undo');if(role==='host')send({type:'state',state,allowed:peerAllowed});});
+action('redo',()=>{assert(redo.length && role!=='guest','Nothing to redo here.');const next=redo.pop();undo.push(clone(state));next.revision=state.revision+1;setState(next,'Redo');if(role==='host')send({type:'state',state,allowed:peerAllowed});});
+$('replay').oninput=()=>{replayIndex=Number($('replay').value);render();};action('live',()=>{replayIndex=null;render();});
+action('fork',()=>{assert(role==='solo','Disconnect before forking.');const next=clone(shown());next.id=uid();next.revision=state.revision+1;undo.push(clone(state));redo=[];setState(next,'Forked replay');status('Forked into an independent surface.');});
+let drag=null,stroke=null;
+function point(e,el=$('board')){const r=el.getBoundingClientRect();return [Math.max(0,Math.min(800,(e.clientX-r.left)/r.width*800)),Math.max(0,Math.min(480,(e.clientY-r.top)/r.height*480)),Math.max(0,Math.min(1,e.pressure||.5))];}
+$('cards').onpointerdown=e=>{const el=e.target.closest('.card');if(!el)return;if(selected!==el.dataset.id && dirty){status('Apply or reload your draft before selecting another card.');return;}if(selected!==el.dataset.id){selected=el.dataset.id;draft(true);}render();if(!e.target.closest('.handle')||!editable())return;const c=state.cards.find(c=>c.id===selected);drag={id:selected,start:point(e),x:c.x,y:c.y,revision:state.revision,pointer:e.pointerId};e.target.setPointerCapture(e.pointerId);};
+$('cards').onpointermove=e=>{if(!drag||e.pointerId!==drag.pointer)return;const p=point(e),el=e.target.closest('.card');if(el){el.style.left=Math.max(0,Math.min(608,drag.x+p[0]-drag.start[0]))/8+'%';el.style.top=Math.max(0,Math.min(360,drag.y+p[1]-drag.start[1]))/4.8+'%';}};
+$('cards').onpointerup=async e=>{if(!drag||e.pointerId!==drag.pointer)return;const d=drag;drag=null;const p=point(e);try{await command({type:'move',id:d.id,x:Math.round(Math.max(0,Math.min(608,d.x+p[0]-d.start[0]))),y:Math.round(Math.max(0,Math.min(360,d.y+p[1]-d.start[1])))},d.revision);}catch(err){status(err.message);}render();};
+$('cards').onpointercancel=()=>{drag=null;render();};
+$('cards').onkeydown=async e=>{if(!e.target.closest('.handle')||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();const c=state.cards.find(c=>c.id===e.target.closest('.card').dataset.id);try{await command({type:'move',id:c.id,x:Math.max(0,Math.min(608,c.x+(e.key==='ArrowLeft'?-10:e.key==='ArrowRight'?10:0))),y:Math.max(0,Math.min(360,c.y+(e.key==='ArrowUp'?-10:e.key==='ArrowDown'?10:0)))});}catch(err){status(err.message);}};
+$('draw-mode').onchange=()=>$('board').classList.toggle('drawing',$('draw-mode').checked);
+$('ink').onpointerdown=e=>{if(!editable()||stroke)return;e.preventDefault();stroke={id:uid(),points:[point(e)],revision:state.revision,pointer:e.pointerId};$('ink').setPointerCapture(e.pointerId);};
+$('ink').onpointermove=e=>{if(!stroke||stroke.pointer!==e.pointerId)return;for(const p of e.getCoalescedEvents?.()||[e])if(stroke.points.length<1200)stroke.points.push(point(p));paintInk($('ink').getContext('2d'),[...state.strokes,stroke]);};
+$('ink').onpointerup=async e=>{if(!stroke||stroke.pointer!==e.pointerId)return;const s=stroke;stroke=null;try{await command({type:'stroke',stroke:{id:s.id,points:s.points}},s.revision);}catch(err){status(err.message);render();}};
+$('ink').onpointercancel=()=>{stroke=null;render();};
+$('image-file').onchange=async()=>{const file=$('image-file').files[0];if(!file)return;const id=selected,revision=state.revision;try{assert(file.size<=10000000,'Choose an image below 10 MB.');const bitmap=await createImageBitmap(file);const canvas=document.createElement('canvas'),scale=Math.min(1,640/Math.max(bitmap.width,bitmap.height));canvas.width=Math.round(bitmap.width*scale);canvas.height=Math.round(bitmap.height*scale);canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();await command({type:'image',id,image:canvas.toDataURL('image/jpeg',.75)},revision);}catch(e){status(e.message);}finally{$('image-file').value='';}};
+function artifact(data=state){return SOURCE.replace(/<script id="surface-data" type="application\/json">[\s\S]*?<\/script>/,()=>'<script id="surface-data" type="application/json">'+safeJSON(data)+'<\/script>');}
+function download(name,data,type){const blob=data instanceof Blob?data:new Blob([data],{type});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);}
+function readArtifact(text){if(text.trim().startsWith('{'))return validate(JSON.parse(text));const match=text.match(/<script\s+id="surface-data"\s+type="application\/json">([\s\S]*?)<\/script>/i);assert(match,'No supported surface state in this HTML.');return validate(JSON.parse(match[1]));}
+action('export-html',()=>{assert(!dirty || replayIndex!==null,'Apply or reload your draft before exporting the live surface.');const text=artifact(shown());download('surface.html',text,'text/html');status('Exported '+bytes(text).toLocaleString()+' bytes, including this app and assets.');});
+action('export-json',()=>download('surface.json',JSON.stringify(shown(),null,2),'application/json'));
+action('roundtrip',()=>{const result=readArtifact(artifact(shown())),ok=JSON.stringify(result)===JSON.stringify(validate(shown()));assert(ok,'Round-trip mismatch.');record('artifact round trip','pass',{bytes:bytes(artifact(shown())),revision:shown().revision});status('PASS · normalized state survived HTML serialization and import. Reopening in another browser is a separate check.');});
+$('import-file').onchange=async()=>{try{assert(role==='solo','Disconnect before importing.');const file=$('import-file').files[0];if(!file)return;assert(file.size<2500000,'Import limit: 2.5 MB.');importCandidate=readArtifact(await file.text());$('import-summary').textContent=importCandidate.title+' · '+importCandidate.cards.length+' cards · '+importCandidate.strokes.length+' strokes';$('import-preview').srcdoc='<!doctype html><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'"><style>body{font:16px system-ui;padding:16px;color:#182322;background:white}p{border:1px solid;padding:10px;white-space:pre-wrap}</style>'+importCandidate.cards.map(c=>'<p>'+escapeHTML(c.text)+'</p>').join('');$('import-dialog').showModal();}catch(e){status(e.message);}finally{$('import-file').value='';}};
+action('confirm-import',()=>{assert(role==='solo' && importCandidate,'No import ready.');undo=[];redo=[];dirty=false;setState(importCandidate,'Imported');importCandidate=null;$('import-dialog').close();status('Imported validated data.');});action('cancel-import',()=>{importCandidate=null;$('import-dialog').close();});
+async function copy(text,title='Copy text'){try{await navigator.clipboard.writeText(text);status('Copied.','global-status');}catch{$('dialog-title').textContent=title;$('dialog-text').value=text;$('text-dialog').showModal();$('dialog-text').focus();$('dialog-text').select();}}
+// Commands are deliberately public for inspection. Native tools use this same path.
+const proposals=new Map();
+const tools={
+ get_surface:{description:'Read the current surface and edit permissions.',inputSchema:{type:'object',properties:{},additionalProperties:false},execute:async()=>({state:clone(state),canEdit:editable()})},
+ propose_edit:{description:'Preview a card text change without applying it.',inputSchema:{type:'object',properties:{id:{type:'string'},text:{type:'string',maxLength:1000}},required:['id','text'],additionalProperties:false},execute:async args=>{const op={type:'edit',id:args.id,text:args.text};applyOperation(state,op,state.revision);const id=uid();proposals.set(id,{op,revision:state.revision});if(proposals.size>30)proposals.delete(proposals.keys().next().value);return {proposalId:id,expectedVersion:state.revision,change:op};}},
+ apply_edit:{description:'Apply a previously proposed edit only at its original version.',inputSchema:{type:'object',properties:{proposalId:{type:'string'},expectedVersion:{type:'integer'}},required:['proposalId','expectedVersion'],additionalProperties:false},execute:async args=>{const p=proposals.get(args.proposalId);assert(p && p.revision===args.expectedVersion,'Unknown proposal or mismatched version.');const result=await command(p.op,p.revision);proposals.delete(args.proposalId);return result;}}
+};
+async function executeTool(name,args){assert(Object.hasOwn(tools,name),'Unknown tool.');assert(args && typeof args==='object' && !Array.isArray(args),'Arguments must be an object.');const schema=tools[name].inputSchema;assert(Object.keys(args).every(k=>Object.hasOwn(schema.properties,k)),'Unexpected argument.');for(const k of schema.required||[])assert(Object.hasOwn(args,k),'Missing '+k);return tools[name].execute(args);}
+window.surfaceLab={getState:()=>clone(state),validate,applyOperation,artifact,readArtifact,executeTool};
+const modelContext=document.modelContext;
+if(modelContext?.registerTool){(async()=>{try{for(const [name,tool] of Object.entries(tools))await modelContext.registerTool({name,...tool,execute:async(args,options)=>{assert(!options?.signal?.aborted,'Tool invocation canceled.');return {content:[{type:'text',text:JSON.stringify(await executeTool(name,args))}]};}});status('Registered 3 native WebMCP tools. Verify discovery with your compatible agent.','mcp-status');}catch(e){status('Native tool registration failed: '+e.message,'mcp-status');}})();}else status('Native WebMCP is unavailable in this browser configuration. The command inspector remains usable.','mcp-status');
+$('tool-name').onchange=()=>{$('tool-args').value=JSON.stringify($('tool-name').value==='propose_edit'?{id:selected,text:'Edited through a shared command'}:$('tool-name').value==='apply_edit'?{proposalId:'paste returned proposal ID',expectedVersion:state.revision}:{},null,2);};
+action('run-tool',async()=>{$('tool-output').textContent=JSON.stringify(await executeTool($('tool-name').value,JSON.parse($('tool-args').value)),null,2);},'tool-output');
+action('conflict-check',()=>{const base=initial(),next=applyOperation(base,{type:'move',id:base.cards[0].id,x:100,y:100},0);let rejected=false;try{applyOperation(next,{type:'edit',id:next.cards[0].id,text:'stale'},0);}catch{rejected=true;}assert(rejected && next.cards[0].text===base.cards[0].text,'Conflict check failed.');record('stale command','pass','Disposable state; no workspace changes');status('PASS · stale edit rejected; newer state preserved.','conflict-result');},'conflict-result');
+// A reliable channel carries bounded, chunked state/commands; an unreliable
+// channel carries disposable pointer positions. No public ICE server by default.
+let assembly=new Map(), outboundTimer=null, lastCursor=0, cursorSeq=0, remoteCursorSeq=-1, cursorTimer=null, videoPointerTimer=null;
+function drain(){
+  if(channel?.readyState!=='open'){return;}
+  try{while(sendQueue.length && channel.bufferedAmount<262144){const text=sendQueue.shift();channel.send(text);sentBytes+=bytes(text);}}
+  catch(e){status('Send failed: '+e.message,'connection-status');disconnect();}
+}
+function send(message){
+  if(channel?.readyState!=='open')return;
+  const text=JSON.stringify(message);assert(bytes(text)<=1600000,'Peer message exceeds limit.');
+  assert(sendQueue.reduce((n,s)=>n+s.length,0)+text.length<4000000,'Peer queue is full; wait before sending more.');
+  const id=uid(),count=Math.ceil(text.length/8000);
+  for(let i=0;i<count;i++)sendQueue.push(JSON.stringify({id,index:i,count,text:text.slice(i*8000,(i+1)*8000)}));drain();
+}
+function wireChannel(dc){
+  channel=dc;channel.bufferedAmountLowThreshold=65536;channel.onbufferedamountlow=drain;
+  channel.onopen=()=>{status(role==='host'?'Peer connected. Viewer access.':'Connected. Waiting for host state.','connection-status');if(role==='host')send({type:'state',state,allowed:peerAllowed});render();};
+  channel.onclose=()=>{status('Disconnected. Host state is retained; create a new session to reconnect.','connection-status');for(const item of pending.values()){clearTimeout(item.timer);item.reject(Error('Connection closed.'));}pending.clear();peerAllowed=false;render();};
+  channel.onerror=()=>status('Data channel error. Reconnect to continue.','connection-status');
+  channel.onmessage=async event=>{try{
+    assert(typeof event.data==='string' && event.data.length<20000,'Invalid transport frame.');receivedBytes+=bytes(event.data);const p=JSON.parse(event.data);
+    assert(typeof p.id==='string'&&p.id.length<=80&&Number.isInteger(p.index)&&Number.isInteger(p.count)&&p.count>0&&p.count<=200&&p.index>=0&&p.index<p.count&&typeof p.text==='string'&&p.text.length<=8000,'Invalid message chunk.');
+    for(const [id,a] of assembly)if(Date.now()-a.time>10000)assembly.delete(id);
+    if(!assembly.has(p.id)){assert(p.index===0 && assembly.size<4,'Incomplete message or too many assemblies.');assembly.set(p.id,{parts:[],count:p.count,time:Date.now()});}
+    const a=assembly.get(p.id);assert(p.index===a.parts.length&&p.count===a.count,'Out-of-order reliable chunk.');a.parts.push(p.text);
+    if(a.parts.length===a.count){assembly.delete(p.id);await receive(JSON.parse(a.parts.join('')));}
+  }catch(e){status('Rejected peer message: '+e.message,'connection-status');}};
+}
+async function receive(m){
+  assert(m && typeof m.type==='string','Unknown message.');
+  if(m.type==='state' && role==='guest'){
+    const next=validate(m.state);assert(typeof m.allowed==='boolean','Invalid permission.');
+    if(next.id===state.id)assert(next.revision>=state.revision,'Older host state rejected.');
+    peerAllowed=m.allowed;setState(next,'Host update',true);status(peerAllowed?'Connected · editing allowed.':'Connected · viewer access.','connection-status');
+  }else if(m.type==='media'){
+    assert(typeof m.active==='boolean','Invalid media status.');remoteMediaActive=m.active;if(!localMedia)$('video-source').value='remote';previewVideo();status(m.active?'Peer is sharing video.':'Peer stopped sharing video.','media-status');
+  }else if(m.type==='permission' && role==='guest'){
+    assert(typeof m.allowed==='boolean','Invalid permission.');peerAllowed=m.allowed;render();status(peerAllowed?'Host granted editing.':'Host revoked editing.','connection-status');
+  }else if(m.type==='command' && role==='host'){
+    assert(typeof m.id==='string'&&m.id.length<=80,'Invalid command ID.');if(handled.has(m.id)){send(handled.get(m.id));return;}
+    let reply;try{assert(peerAllowed,'Host has not granted editing.');const result=commit(m.op,m.expected,true);reply={type:'ack',id:m.id,result};}catch(e){reply={type:'ack',id:m.id,error:e.message};send({type:'state',state,allowed:peerAllowed});}
+    handled.set(m.id,reply);if(handled.size>100)handled.delete(handled.keys().next().value);send(reply);
+  }else if(m.type==='ack' && role==='guest'){
+    const item=pending.get(m.id);if(item){clearTimeout(item.timer);pending.delete(m.id);rtt=Math.round(performance.now()-item.start);if(m.error)item.reject(Error(m.error));else item.resolve(m.result);}
+  }else if(m.type==='ping')send({type:'pong',at:m.at});
+  else if(m.type==='pong' && bounded(m.at,0,Number.MAX_SAFE_INTEGER))rtt=Math.round(performance.now()-m.at);
+  else if(m.type==='sdp'){
+    const connection=pc;assert(m.description?.type==='offer'||m.description?.type==='answer','Invalid session description.');
+    if(m.description.type==='offer'){await connection.setRemoteDescription(m.description);await connection.setLocalDescription(await connection.createAnswer());await iceComplete(connection);if(pc===connection)send({type:'sdp',description:connection.localDescription});}
+    else if(connection.signalingState==='have-local-offer')await connection.setRemoteDescription(m.description);
+  }
+}
+function wirePresence(dc){presence=dc;dc.onmessage=e=>{try{assert(typeof e.data==='string'&&e.data.length<1000,'Invalid presence.');const m=JSON.parse(e.data);assert(bounded(m.x,0,1)&&bounded(m.y,0,1)&&Number.isSafeInteger(m.seq),'Invalid pointer.');if(m.seq<=remoteCursorSeq)return;remoteCursorSeq=m.seq;const el=m.target==='video'?$('video-pointer'):$('peer-cursor');if(m.target==='video'){const r=videoBox(),parent=$('shared-video').parentElement.getBoundingClientRect();el.style.left=(r.left-parent.left+m.x*r.width)+'px';el.style.top=(r.top-parent.top+m.y*r.height)+'px';}else{el.style.left=m.x*100+'%';el.style.top=m.y*100+'%';}el.hidden=false;if(m.target==='video'){clearTimeout(videoPointerTimer);videoPointerTimer=setTimeout(()=>el.hidden=true,1500);}else{clearTimeout(cursorTimer);cursorTimer=setTimeout(()=>el.hidden=true,1500);}}catch{}};}
+function videoBox(){const element=$('shared-video'),r=element.getBoundingClientRect();let {left,top,width,height}=r;if(element.videoWidth){const scale=Math.min(width/element.videoWidth,height/element.videoHeight),w=element.videoWidth*scale,h=element.videoHeight*scale;left+=(width-w)/2;top+=(height-h)/2;width=w;height=h;}return {left,top,width,height};}
+function pointToPeer(e,element,target){if(presence?.readyState!=='open'||presence.bufferedAmount>16000||performance.now()-lastCursor<40)return;if(target==='video'&&element.srcObject!==remoteMedia)return;lastCursor=performance.now();const r=target==='video'?videoBox():element.getBoundingClientRect();const x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;if(x<0||x>1||y<0||y>1)return;presence.send(JSON.stringify({target,x,y,seq:++cursorSeq}));}
+function previewVideo(){if($('video-source').value==='local')$('shared-video').muted=true;$('shared-video').srcObject=$('video-source').value==='local'?localMedia:(remoteMediaActive?remoteMedia:null);if($('shared-video').srcObject)$('shared-video').play().catch(()=>status('Press Play received video.','media-status'));}
+$('video-source').onchange=previewVideo;
+$('board').addEventListener('pointermove',e=>pointToPeer(e,$('board'),'board'));
+$('shared-video').addEventListener('pointermove',e=>pointToPeer(e,$('shared-video'),'video'));
+function iceComplete(connection){return new Promise((resolve,reject)=>{if(connection.iceGatheringState==='complete')return resolve();const timer=setTimeout(()=>{cleanup();reject(Error('ICE gathering timed out. Check your ICE settings.'));},12000);const check=()=>{if(connection.iceGatheringState==='complete'){cleanup();resolve();}else if(connection.connectionState==='closed'){cleanup();reject(Error('Connection closed.'));}};function cleanup(){clearTimeout(timer);connection.removeEventListener('icegatheringstatechange',check);}connection.addEventListener('icegatheringstatechange',check);});}
+function stopMedia(){mediaGeneration++;const old=localMedia;localMedia=null;if(old)send({type:'media',active:false});if(old)old.getTracks().forEach(t=>t.stop());if(captureController?.forwardWheel)captureController.forwardWheel(null).catch(()=>{});captureController=null;$('forward-wheel').checked=false;if($('shared-video').srcObject===old)$('shared-video').srcObject=null;status('Local media stopped.','media-status');}
+function disconnect(){
+  peerGeneration++;clearTimeout(pollTimer);pollTimer=null;session=null;stopMedia();
+  channel?.close();presence?.close();pc?.close();pc=null;channel=null;presence=null;role='solo';peerAllowed=false;sendQueue=[];assembly.clear();handled.clear();remoteCursorSeq=-1;$('allow-control').checked=false;$('session-link').value='';$('signal-out').value='';$('peer-cursor').hidden=true;$('video-pointer').hidden=true;$('shared-video').srcObject=null;remoteMedia=null;remoteMediaActive=false;
+  for(const item of pending.values()){clearTimeout(item.timer);item.reject(Error('Disconnected.'));}pending.clear();render();status('Standalone. Local state retained.','connection-status');
+}
+function newPeer(nextRole){
+  assert('RTCPeerConnection' in window,'WebRTC is unavailable.');disconnect();role=nextRole;
+  const iceServers=JSON.parse($('ice-servers').value);assert(Array.isArray(iceServers)&&iceServers.length<=8,'ICE settings must be an array of up to 8 servers.');
+  const connection=new RTCPeerConnection({iceServers});pc=connection;
+  // Reserve a video transceiver before the first offer to avoid adding tracks
+  // through a second signaling route for the common host-sharing case.
+  connection.addTransceiver('video',{direction:'sendrecv'});connection.addTransceiver('audio',{direction:'sendrecv'});
+  connection.ondatachannel=e=>{if(e.channel.label==='surface')wireChannel(e.channel);else if(e.channel.label==='presence')wirePresence(e.channel);else e.channel.close();};
+  connection.ontrack=e=>{if(!remoteMedia)remoteMedia=new MediaStream();remoteMedia.addTrack(e.track);if(!localMedia)$('video-source').value='remote';previewVideo();e.track.onended=()=>{remoteMediaActive=false;previewVideo();status('Peer media ended.','media-status');};};
+  connection.onconnectionstatechange=()=>{if(pc!==connection)return;status('WebRTC: '+connection.connectionState+' · '+role,'connection-status');if(['failed','disconnected'].includes(connection.connectionState))status('Connection '+connection.connectionState+'. Host state is retained. Disconnect and create a new session to reconnect.','connection-status');render();};
+  if(nextRole==='host'){wireChannel(connection.createDataChannel('surface'));wirePresence(connection.createDataChannel('presence',{ordered:false,maxRetransmits:0}));}
+  render();return connection;
+}
+async function offer(){const connection=newPeer('host');await connection.setLocalDescription(await connection.createOffer());await iceComplete(connection);assert(connection===pc,'Session was replaced.');return connection.localDescription;}
+async function answer(description){assert(description?.type==='offer'&&typeof description.sdp==='string'&&description.sdp.length<100000,'Invalid offer.');const connection=newPeer('guest');await connection.setRemoteDescription(description);await connection.setLocalDescription(await connection.createAnswer());await iceComplete(connection);assert(connection===pc,'Session was replaced.');return connection.localDescription;}
+async function request(path,body){const response=await fetch(new URL('api/'+path,location.href.split('#')[0]),{method:body?'POST':'GET',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined,cache:'no-store',signal:AbortSignal.timeout(15000)});const data=await response.json();if(!response.ok)throw Error(data.error||'Pairing request failed.');return data;}
+async function checkServer(){if(location.protocol==='file:'){status('Exported file · use manual pairing, or open the hosted lab.','server-status');return;}try{const r=await request('health');serverAvailable=r.service==='one-proof';}catch{}status(serverAvailable?'Pairing helper available · links expire after 15 minutes.':'Static server · use manual pairing, or run python3 proofs/server.py --port 8765 and open that port.','server-status');}
+function pollAnswer(generation){pollTimer=setTimeout(async()=>{if(generation!==peerGeneration||!session)return;try{const r=await request('session/'+session.id+'?token='+encodeURIComponent(session.hostToken));if(generation!==peerGeneration)return;if(r.answer){await pc.setRemoteDescription(r.answer);status('Answer received. Connecting…','connection-status');}else pollAnswer(generation);}catch(e){status(e.message,'connection-status');}},900);}
+action('host',async()=>{assert(serverAvailable,'Open this lab through server.py for link pairing, or use manual signaling below.');const description=await offer(),generation=peerGeneration;const r=await request('session',{offer:description});assert(generation===peerGeneration,'Session was replaced.');session=r;const link=new URL(location.href);link.hash='join='+r.id+'.'+r.guestToken;$('session-link').value=link.href;status('Session created. Send the link to one peer; it grants viewing only.','connection-status');pollAnswer(generation);},'connection-status');
+action('join',async()=>{assert(serverAvailable,'Link pairing requires the helper server on this origin.');const link=new URL($('join-link').value||location.href);assert(link.origin===location.origin && link.pathname===location.pathname,'Open the session link on the host’s origin before joining.');const match=link.hash.match(/^#join=([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_-]+)$/);assert(match,'Paste a valid session link.');const r=await request('session/'+match[1]+'?token='+encodeURIComponent(match[2]));const description=await answer(r.offer);await request('session/'+match[1],{token:match[2],answer:description});status('Answer sent. Connecting…','connection-status');},'connection-status');
+action('disconnect',disconnect,'connection-status');action('copy-link',()=>{assert($('session-link').value,'Create a session first.');return copy($('session-link').value);},'connection-status');
+action('make-offer',async()=>{$('signal-out').value=JSON.stringify(await offer());status('Send the offer to your peer, then paste their answer.','connection-status');},'connection-status');
+action('make-answer',async()=>{$('signal-out').value=JSON.stringify(await answer(JSON.parse($('signal-in').value)));status('Send this answer back to the host.','connection-status');},'connection-status');
+action('accept-answer',async()=>{assert(role==='host'&&pc?.signalingState==='have-local-offer','Create an offer first.');const d=JSON.parse($('signal-in').value);assert(d.type==='answer'&&typeof d.sdp==='string'&&d.sdp.length<100000,'Invalid answer.');await pc.setRemoteDescription(d);},'connection-status');action('copy-signal',()=>copy($('signal-out').value),'connection-status');
+$('allow-control').onchange=()=>{if(role!=='host')return;peerAllowed=$('allow-control').checked;send({type:'permission',allowed:peerAllowed});status(peerAllowed?'Peer editing enabled.':'Peer editing revoked.','connection-status');};
+setInterval(()=>{if(channel?.readyState==='open')send({type:'ping',at:performance.now()});$('connection-metrics').textContent=`Sent ${sentBytes.toLocaleString()} B · received ${receivedBytes.toLocaleString()} B · RTT ${rtt===null?'—':rtt+' ms'} · queued ${channel?.bufferedAmount||0} B`;},3000);
+async function shareMedia(kind){
+  assert(pc && channel?.readyState==='open','Connect a peer before sharing.');assert(navigator.mediaDevices,'Media capture needs HTTPS or localhost.');
+  const connection=pc;stopMedia();const generation=mediaGeneration;let controller=null;
+  if(kind==='screen'){assert(navigator.mediaDevices.getDisplayMedia,'Screen capture unavailable. A phone can receive a desktop share or share its camera.');if(window.CaptureController)controller=new CaptureController();}
+  const stream=kind==='screen'?await navigator.mediaDevices.getDisplayMedia({video:true,audio:$('include-audio').checked,...(controller?{controller}:{})}):await navigator.mediaDevices.getUserMedia({video:{width:{ideal:640},height:{ideal:480}},audio:$('include-audio').checked});
+  if(connection!==pc||generation!==mediaGeneration){stream.getTracks().forEach(t=>t.stop());throw Error('Capture canceled because the session changed.');}
+  localMedia=stream;captureController=controller;const sender=connection.getTransceivers().find(t=>t.receiver.track.kind==='video')?.sender;assert(sender,'No video sender. Reconnect before sharing.');
+  try{await sender.replaceTrack(stream.getVideoTracks()[0]);const audioSender=connection.getTransceivers().find(t=>t.receiver.track.kind==='audio')?.sender;await audioSender?.replaceTrack(stream.getAudioTracks()[0]||null);}catch{sender.replaceTrack(null).catch(()=>{});stopMedia();throw Error('This capture cannot replace the negotiated video track. Reconnect and try a lower-resolution camera.');}
+  $('video-source').value='local';previewVideo();send({type:'media',active:true});stream.getVideoTracks()[0].onended=()=>{if(localMedia===stream)stopMedia();};status(kind==='screen'?'Sharing selected surface. Browser stop-sharing controls remain available.':'Sharing camera video.','media-status');
+}
+action('share-screen',()=>shareMedia('screen'),'media-status');action('share-camera',()=>shareMedia('camera'),'media-status');action('stop-media',()=>{stopMedia();pc?.getSenders().filter(s=>s.track).forEach(s=>s.replaceTrack(null).catch(()=>{}));},'media-status');action('video-play',()=>$('shared-video').play(),'media-status');
+action('video-sound',async()=>{assert($('video-source').value==='remote' && remoteMediaActive,'Select active peer video first.');$('shared-video').muted=false;await $('shared-video').play();},'media-status');
+action('zoom-in',async()=>{assert(captureController?.increaseZoomLevel,'Captured-tab zoom unavailable. Share a supported browser tab first.');await captureController.increaseZoomLevel();},'media-status');action('zoom-out',async()=>{assert(captureController?.decreaseZoomLevel,'Captured-tab zoom unavailable.');await captureController.decreaseZoomLevel();},'media-status');
+$('forward-wheel').onchange=async()=>{try{assert(captureController?.forwardWheel,'Captured-tab wheel control unavailable.');await captureController.forwardWheel($('forward-wheel').checked?$('shared-video'):null);}catch(e){$('forward-wheel').checked=false;status(e.message,'media-status');}};
+// Native parsing and rendering experiments are isolated from imported content.
+let streamStarted=0;
+action('stream-start',()=>{assert(serverAvailable,'Start server.py and open this lab on that port.');streamStarted=performance.now();$('stream-frame').onload=streamLoaded;$('stream-frame').removeAttribute('srcdoc');$('stream-frame').src='stream?nonce='+Date.now();status('Streaming… type in the frame while waiting.','stream-status');},'stream-status');
+action('stream-stop',()=>{try{$('stream-frame').contentWindow.stop();status('Stream interrupted; the received content and draft remain.','stream-status');}catch(e){throw Error('Could not interrupt this frame: '+e.message);}},'stream-status');
+function streamLoaded(){if(!streamStarted)return;try{const doc=$('stream-frame').contentDocument;const ok=doc?.querySelector('#stream-proof')?.textContent==='Completed';const detail={elapsed:Math.round(performance.now()-streamStarted),draft:!!doc?.querySelector('textarea')};record('native stream',ok?'pass':'incomplete / unsupported',detail);status((ok?'PASS · native regions filled. ':'Incomplete or unsupported native patching. ')+detail.elapsed+' ms. Check whether your draft survived.','stream-status');}catch{status('Frame loaded. Inspect its output.','stream-status');}streamStarted=0;}
+$('stream-frame').onload=streamLoaded;
+action('patch-fixture',()=>{streamStarted=0;const frame=$('stream-frame');frame.onload=()=>{try{const ok=frame.contentDocument.getElementById('target').textContent==='arrived';record('native parser patch',ok?'pass':'unsupported',navigator.userAgent);status(ok?'PASS · parser patched a named region without JavaScript.':'Native patching is unavailable. The template stays inert.','stream-status');}catch(e){status(e.message,'stream-status');}frame.onload=null;};frame.removeAttribute('src');frame.srcdoc='<!doctype html><meta charset="utf-8"><body><div id="target"><?marker name="proof"></div><template for="proof"><strong>arrived</strong></template>';},'stream-status');
+$('drawable-form').onsubmit=$('gpu-form').onsubmit=e=>e.preventDefault();
+let htmlRendering=false;
+function sizeCanvas(canvas){const w=canvas.clientWidth,h=canvas.clientHeight,dpr=devicePixelRatio||1;const width=Math.round(w*dpr),height=Math.round(h*dpr);if(canvas.width!==width)canvas.width=width;if(canvas.height!==height)canvas.height=height;return {w,h,dpr};}
+// This experimental API snapshots at device scale already; scaling the 2D
+// context again doubles the pixels without matching the DOM hit geometry.
+function paintHTML(){const canvas=$('html-canvas');sizeCanvas(canvas);const ctx=canvas.getContext('2d');ctx.reset();ctx.fillStyle='#e9eeeb';ctx.fillRect(0,0,canvas.width,canvas.height);const source=$('html-source');source.style.width=canvas.clientWidth+'px';source.style.height=canvas.clientHeight+'px';const transform=ctx.drawElementImage(source,0,0);if(transform?.toString)$('html-source').style.transform=transform.toString();}
+action('draw-html',()=>{assert('drawElementImage' in CanvasRenderingContext2D.prototype,'HTML-in-Canvas is unavailable. Enable canvas-draw-element in a compatible Chromium build.');const canvas=$('html-canvas');canvas.onpaint=()=>{try{paintHTML();htmlRendering=true;status('Rendered. Test text selection, field editing, keyboard focus and rotation.','html-status');}catch(e){status('Rendering failed: '+e.message,'html-status');}};canvas.requestPaint?.();$('drawable-form').style.transform='rotate('+$('html-angle').value+'deg)';$('drawable-form').style.background='#fff';},'html-status');
+$('html-angle').oninput=()=>{$('drawable-form').style.transform='rotate('+$('html-angle').value+'deg)';$('html-canvas').requestPaint?.();};
+action('html-png',async()=>{assert(htmlRendering,'Render the HTML first.');const blob=await new Promise(resolve=>$('html-canvas').toBlob(resolve));assert(blob,'Canvas export failed.');download('html-canvas.png',blob);record('HTML canvas export','pass',{bytes:blob.size});},'html-status');
+status('drawElementImage' in CanvasRenderingContext2D.prototype?'API present; start rendering to test behavior.':'Experimental API unavailable here. The ordinary DOM comparison remains editable.','html-status');
+// Capture an untransformed source region with a CSS-transformed child. The
+// source region stays in the same coordinates for pixels and hit testing.
+// This avoids baking a transform into the texture and applying it a second time.
+let gpuCleanup=null, gpuRendering=false, gpuPaint=null;
+action('gpu-html-start',()=>{
+  gpuCleanup?.();gpuRendering=false;
+  const canvas=$('gpu-html'),form=$('gpu-form'),gl=canvas.getContext('webgl2',{preserveDrawingBuffer:true});
+  assert(gl?.texElementImage2D && canvas.getElementTransform,'This browser lacks the experimental WebGL element-texture / geometry APIs.');
+  const shaders=[],program=gl.createProgram(),buffer=gl.createBuffer(),texture=gl.createTexture();
+  gpuCleanup=()=>{canvas.onpaint=null;gpuPaint=null;gpuRendering=false;gl.deleteTexture(texture);gl.deleteBuffer(buffer);gl.deleteProgram(program);shaders.forEach(shader=>gl.deleteShader(shader));};
+  const shader=(type,source)=>{const sh=gl.createShader(type);shaders.push(sh);gl.shaderSource(sh,source);gl.compileShader(sh);assert(gl.getShaderParameter(sh,gl.COMPILE_STATUS),gl.getShaderInfoLog(sh));gl.attachShader(program,sh);};
+  shader(gl.VERTEX_SHADER,`#version 300 es
+in vec2 point; uniform vec2 size; out vec2 uv;
+void main(){gl_Position=vec4(point/size*vec2(2,-2)+vec2(-1,1),0,1);uv=point/size;}`);
+  shader(gl.FRAGMENT_SHADER,`#version 300 es
+precision mediump float; uniform sampler2D content; in vec2 uv; out vec4 color;
+void main(){color=texture(content,uv);}`);
+  gl.linkProgram(program);assert(gl.getProgramParameter(program,gl.LINK_STATUS),gl.getProgramInfoLog(program));
+  gl.useProgram(program);gl.bindBuffer(gl.ARRAY_BUFFER,buffer);const position=gl.getAttribLocation(program,'point');gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
+  gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,texture);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);gl.uniform1i(gl.getUniformLocation(program,'content'),0);
+  gpuPaint=()=>{try{
+    const {w,h}=sizeCanvas(canvas);$('gpu-source').style.width=w+'px';$('gpu-source').style.height=h+'px';
+    gl.viewport(0,0,canvas.width,canvas.height);gl.clearColor(.91,.94,.92,1);gl.clear(gl.COLOR_BUFFER_BIT);gl.useProgram(program);gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([0,0,w,0,0,h,w,h]),gl.STATIC_DRAW);
+    gl.uniform2f(gl.getUniformLocation(program,'size'),w,h);gl.bindTexture(gl.TEXTURE_2D,texture);
+    if(gl.texElementImage2D.length===3)gl.texElementImage2D(gl.TEXTURE_2D,gl.RGBA8,$('gpu-source'));else gl.texElementImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,$('gpu-source'));
+    gl.drawArrays(gl.TRIANGLE_STRIP,0,4);assert(gl.getError()===gl.NO_ERROR,'WebGL reported a rendering error.');$('gpu-source').style.transform=canvas.getElementTransform($('gpu-source'),new DOMMatrix()).toString();gpuRendering=true;status('Rendered through WebGL. Try editing, selecting and rotating the form.','gpu-status');
+  }catch(e){status('GPU rendering failed: '+e.message,'gpu-status');}};
+  canvas.onpaint=gpuPaint;form.style.transform='rotate('+$('gpu-angle').value+'deg)';canvas.requestPaint?.();form.style.background='#fff';
+},'gpu-status');
+$('gpu-angle').oninput=()=>{$('gpu-form').style.transform='rotate('+$('gpu-angle').value+'deg)';$('gpu-html').requestPaint?.();};
+action('gpu-html-png',async()=>{assert(gpuRendering,'Render the WebGL form first.');gpuPaint();const blob=await new Promise(resolve=>$('gpu-html').toBlob(resolve));assert(blob,'WebGL PNG export failed.');download('html-webgl.png',blob);record('HTML WebGL export','pass',{bytes:blob.size});},'gpu-status');
+window.addEventListener('pagehide',()=>gpuCleanup?.());
+// Raster output and WebCodecs intentionally report different retained capabilities.
+async function raster(canvas,data=shown()){
+  const ctx=canvas.getContext('2d');ctx.clearRect(0,0,800,480);ctx.fillStyle='#f9fbfa';ctx.fillRect(0,0,800,480);
+  for(const c of data.cards){ctx.fillStyle=c.color;ctx.fillRect(c.x,c.y,192,120);ctx.strokeStyle='#53615e';ctx.strokeRect(c.x,c.y,192,120);ctx.save();ctx.beginPath();ctx.rect(c.x+5,c.y+5,182,110);ctx.clip();let y=c.y+22;
+    if(c.image){const img=new Image();img.src=c.image;await img.decode();ctx.drawImage(img,c.x+8,c.y+8,176,65);y+=70;}
+    ctx.fillStyle='#182322';ctx.font='16px system-ui';for(const line of c.text.split('\n')){let row='';for(const word of line.split(' ')){if(ctx.measureText(row+word).width>174&&row){ctx.fillText(row,c.x+8,y);y+=20;row='';}row+=word+' ';}ctx.fillText(row,c.x+8,y);y+=20;}ctx.restore();}
+  const ink=document.createElement('canvas');ink.width=800;ink.height=480;paintInk(ink.getContext('2d'),data.strokes);ctx.drawImage(ink,0,0);return canvas;
+}
+action('measure-state',async()=>{const snapshot=clone(shown());await raster($('codec-canvas'),snapshot);const png=await new Promise(r=>$('codec-canvas').toBlob(r));assert(png,'PNG export failed.');const result={stateBytes:bytes(snapshot),portableHTMLBytes:bytes(artifact(snapshot)),pngBytes:png.size,revision:snapshot.revision,retained:{HTML:'Text, state, assets, editing and commands',PNG:'Rendered pixels only'}};record('artifact sizes','measured',result);status(JSON.stringify(result,null,2),'codec-status');},'codec-status');
+action('save-png',async()=>{await raster($('codec-canvas'));const blob=await new Promise(r=>$('codec-canvas').toBlob(r));assert(blob,'PNG export failed.');download('surface.png',blob);},'codec-status');
+let codecRun=0;
+action('run-codec',async()=>{
+  assert(window.VideoEncoder && window.VideoDecoder && window.VideoFrame,'WebCodecs encode/decode unavailable.');const run=++codecRun;const start=performance.now(),snapshot=clone(shown()),source=document.createElement('canvas');source.width=800;source.height=480;await raster(source,snapshot);const config={codec:'vp8',width:800,height:480,bitrate:800000,framerate:30};assert((await VideoEncoder.isConfigSupported(config)).supported && (await VideoDecoder.isConfigSupported({codec:'vp8'})).supported,'VP8 encode/decode is unsupported here.');
+  let encoded=0,decoded=0,total=0,failure=null;const chunks=[];const decoder=new VideoDecoder({output:frame=>{try{if(run===codecRun)$('codec-canvas').getContext('2d').drawImage(frame,0,0);decoded++;}finally{frame.close();}},error:e=>failure=e});
+  const encoder=new VideoEncoder({output:(chunk,metadata)=>{encoded++;total+=chunk.byteLength;chunks.push(chunk);if(metadata.decoderConfig && decoder.state==='unconfigured')decoder.configure(metadata.decoderConfig);},error:e=>failure=e});
+  try{encoder.configure(config);const moving=document.createElement('canvas');moving.width=800;moving.height=480;const ctx=moving.getContext('2d');for(let i=0;i<30;i++){assert(run===codecRun,'Codec run canceled.');ctx.drawImage(source,0,0);ctx.fillStyle='#6732ad';ctx.fillRect(i*20,440,24,24);const frame=new VideoFrame(moving,{timestamp:Math.round(i*1000000/30),duration:33333});try{encoder.encode(frame,{keyFrame:i===0});}finally{frame.close();}while(encoder.encodeQueueSize>3){await new Promise(r=>setTimeout(r,0));assert(!failure,failure?.message);assert(run===codecRun,'Codec run canceled.');}await new Promise(r=>setTimeout(r,0));}
+    await encoder.flush();assert(!failure,failure?.message);if(decoder.state==='unconfigured')decoder.configure({codec:'vp8'});for(const chunk of chunks){assert(run===codecRun,'Codec run canceled.');decoder.decode(chunk);while(decoder.decodeQueueSize>3){await new Promise(r=>setTimeout(r,0));assert(!failure,failure?.message);}}await decoder.flush();assert(!failure,failure?.message);assert(run===codecRun,'Codec run canceled.');assert(decoded===30,'Decoded frame count differs from input.');const result={codec:'vp8',inputFrames:30,encodedFrames:encoded,decodedFrames:decoded,encodedBytes:total,elapsedMs:Math.round(performance.now()-start),includes:'Raster generation, encode and decode; no network or media container'};record('WebCodecs round trip','pass',result);status(JSON.stringify(result,null,2),'codec-status');
+  }finally{if(encoder.state!=='closed')encoder.close();if(decoder.state!=='closed')decoder.close();}
+},'codec-status');action('cancel-codec',()=>{codecRun++;status('Cancellation requested.','codec-status');},'codec-status');
+// Device evidence is explicit observation, never inferred from API presence.
+const lifecycle=[];
+function life(event){lifecycle.push(new Date().toLocaleTimeString()+' '+event);if(lifecycle.length>16)lifecycle.shift();$('lifecycle-log').textContent=lifecycle.join('\n');}
+const checks=['Pen pressure and multi-touch behave correctly','Keyboard and rotation preserve the draft','Lock / background / return preserves edits','Peer reconnect restores host state','Exported HTML reopens offline on this device'];
+for(const text of checks){const label=document.createElement('label'),input=document.createElement('input');input.type='checkbox';label.append(input,' '+text);label.style.margin='12px 0';input.onchange=()=>record('manual: '+text,input.checked?'observed pass':'unchecked',{userAgent:navigator.userAgent});$('device-checks').append(label);}
+function device(){status(`${navigator.userAgent}\n${innerWidth} × ${innerHeight} · DPR ${devicePixelRatio} · touch points ${navigator.maxTouchPoints}\nSecure context: ${isSecureContext} · visibility: ${document.visibilityState}`,'device-status');}
+async function releaseWake(){if(wakeLock){await wakeLock.release();wakeLock=null;}}
+action('wake',async()=>{assert(navigator.wakeLock,'Wake Lock unavailable.');await releaseWake();wakeLock=await navigator.wakeLock.request('screen');wakeLock.onrelease=()=>life('Wake lock released');life('Wake lock acquired');},'device-status');action('release-wake',releaseWake,'device-status');
+action('share-file',async()=>{const file=new File([artifact()],'surface.html',{type:'text/html'});assert(navigator.canShare?.({files:[file]}),'File sharing unavailable. Use Export HTML instead.');await navigator.share({files:[file],title:state.title});},'device-status');
+action('export-evidence',()=>download('surface-evidence.json',JSON.stringify({at:new Date().toISOString(),userAgent:navigator.userAgent,secure:isSecureContext,viewport:[innerWidth,innerHeight],evidence,lifecycle},null,2),'application/json'));
+document.addEventListener('visibilitychange',()=>{save();saveDraft();device();life('Visibility: '+document.visibilityState);});window.addEventListener('pagehide',()=>{save();saveDraft();stopMedia();releaseWake().catch(()=>{});});window.addEventListener('pageshow',e=>life('Page shown · restored from back/forward cache: '+e.persisted));window.addEventListener('online',()=>life('Online'));window.addEventListener('offline',()=>life('Offline'));window.addEventListener('resize',device);window.visualViewport?.addEventListener('resize',()=>life('Visual viewport: '+Math.round(visualViewport.width)+' × '+Math.round(visualViewport.height)));
+const proofInfo={surface:['Portable editable HTML','validate, artifact, readArtifact, applyOperation','Export, reopen offline, edit and import; assert normalized state matches.'],connect:['Real WebRTC shared surface','newPeer, wireChannel, receive, server.py','Pair independent browser contexts; grant/revoke editing; test stale commands, disconnect and reconnect.'],agents:['Versioned human and agent commands','executeTool, propose_edit, apply_edit','Propose, mutate state, then apply the stale proposal and verify rejection. Native WebMCP needs a compatible client.'],render:['Native HTML patching and HTML-in-Canvas','stream handler in server.py; paintHTML','Type during streamed updates; verify draft preservation. Test canvas selection, focus and export in a compatible flagged browser.'],measure:['Task-based codec and mobile checks','raster, run-codec, lifecycle events','Count encoded/decoded frames and total artifact bytes; explicitly record real-device observations.']};
+for(const button of document.querySelectorAll('[data-prompt]'))button.onclick=()=>{const [title,source,test]=proofInfo[button.dataset.prompt];copy(`Use $browser-native-spike to adapt this proof to my current project.\nPattern: ${title}\nSource: ${location.protocol==='file:'?'This exported HTML file':location.origin+location.pathname}\nRepository: https://github.com/chriswhawkins/one.html/tree/main/proofs\nLocate: ${source}\nAcceptance test: ${test}\nRead the source and support files before adapting. Preserve data validation, keyboard access, resource cleanup and explicit unsupported states. Do not claim API detection proves behavior. This local version may be unpublished; ask for the source if the repository does not contain it.`,title);};
+function route(){let id=location.hash.slice(1)||'surface';if(id.startsWith('join=')){id='connect';$('join-link').value=location.href;}if(!proofInfo[id])id='surface';document.querySelectorAll('.view').forEach(el=>el.hidden=el.id!==id);document.querySelectorAll('nav a').forEach(a=>{if(a.hash==='#'+id)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});}
+window.addEventListener('hashchange',route);route();recoverDraft();render();save();device();life('Workspace opened');checkServer();
+})();
+</script>
+</body>
+</html>

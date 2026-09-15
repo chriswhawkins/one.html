@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><title>Runtime & transport lab · one.html</title>
+<style>
+:root{color-scheme:light dark;--bg:#f4f4f0;--paper:#fff;--ink:#182322;--line:#bdcbc4;--accent:#126549}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui}main{max-width:1100px;margin:auto;padding:24px}header{display:flex;justify-content:space-between;gap:20px;align-items:center;border-bottom:1px solid var(--ink);padding-bottom:20px}h1{font-size:28px;margin:0}h2{font-size:22px}a{color:var(--accent)}section{margin:24px 0;padding:24px;border:1px solid var(--line);background:var(--paper)}label{display:block;margin:12px 0}textarea,input,select,button{font:inherit;color:inherit;background:var(--paper);border:1px solid var(--line);padding:9px;max-width:100%}textarea,input{width:100%;display:block}textarea,pre,code{font:14px/1.6 ui-monospace,monospace}button{cursor:pointer;border-color:var(--ink);margin:3px 4px 3px 0}button:disabled{opacity:.5}pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow:auto;padding:12px;background:var(--bg)}.note{font-size:14px}.row{display:flex;flex-wrap:wrap;gap:10px}output{font-variant-numeric:tabular-nums}details{margin-top:18px}summary{cursor:pointer}dialog{width:min(700px,94vw);background:var(--paper);color:var(--ink)}:focus-visible{outline:3px solid #db8100;outline-offset:3px}@media(prefers-color-scheme:dark){:root{--bg:#161c1a;--paper:#202925;--ink:#e4ede8;--line:#4b5c52;--accent:#74d4af}}@media(max-width:600px){main{padding:16px}section{padding:16px}header{align-items:start}h1{font-size:24px}}
+</style>
+<main><header><h1>Runtime & transport lab</h1><a href="./">← Surface lab</a></header><p>Prove what a browser can run and carry. Runtime downloads and remote connections start only when you press a button.</p><button id="prompt">Copy agent prompt</button>
+<section id="runtime"><h2>SQL and Python inside a worker</h2><p>The language needs a WebAssembly runtime. Your code runs off the UI thread; terminate the worker to stop runaway work.</p><label>Runtime<select id="language"><option value="sqlite">SQLite 3.53.4</option><option value="python">Pyodide 0.29.3 / Python</option></select></label><div class="row"><button id="load">Load runtime from CDN</button><button id="run" disabled>Run code</button><button id="stop">Terminate worker</button><button id="download-db" disabled>Export SQLite database</button><button id="save-db" disabled>Save database to OPFS</button><button id="restore-db" disabled>Restore database from OPFS</button></div><label>Code<textarea id="code" rows="7" spellcheck="false">CREATE TABLE IF NOT EXISTS readings (device TEXT, value REAL);
+DELETE FROM readings;
+INSERT INTO readings VALUES ('phone', 12.5), ('tablet', 18.0), ('desktop', 9.5);
+SELECT device, value, round(value / (SELECT sum(value) FROM readings) * 100, 1) AS percent FROM readings ORDER BY value DESC;</textarea></label><p class="note">A running UI clock: <output id="clock">0</output>. SQLite uses memory until explicitly saved or exported. OPFS uses only <code>one-proof-runtime.sqlite3</code> in this origin.</p><pre id="runtime-output" role="status">No runtime downloaded.</pre><details><summary>Downloads, execution and limits</summary><p>SQLite loads the pinned community npm distribution linked by the SQLite project. Pyodide loads its pinned official distribution through jsDelivr. Their supporting assets can be several megabytes. The browser caches downloads; this page does not guarantee offline runtime availability.</p><p>Run code you trust. A worker protects UI responsiveness; it is not a security boundary against code that uses browser network or storage APIs. Results are bounded for display. Runtime and execution timings are separate.</p><p><a href="https://sqlite.org/wasm/doc/trunk/npm.md">SQLite distribution</a> · <a href="https://pyodide.org/en/0.29.3/usage/quickstart.html">Pyodide source</a></p></details></section>
+<section id="transport"><h2>An actual transport round trip</h2><p>Send the same disposable payload to an echo endpoint. Measure complete round-trip latency, then compare a different transport against a compatible server.</p><label>Transport<select id="transport-kind"><option value="websocket">WebSocket</option><option value="webtransport">WebTransport bidirectional stream</option></select></label><label>Endpoint<input id="endpoint" type="url"></label><label>Payload<textarea id="payload" rows="3" maxlength="8000">{"type":"surface.move","id":"card-1","x":120,"y":90}</textarea></label><button id="echo">Connect, send & verify echo</button><button id="cancel-echo">Cancel connection</button><pre id="transport-output" role="status">The Python helper provides /proofs/echo for WebSocket. WebTransport needs a separate HTTPS/HTTP3 echo endpoint with a trusted certificate.</pre><p class="note">An echo proves delivery, ordering for this message and measured round-trip time. It does not establish performance under congestion or implement Media over QUIC.</p></section>
+<section><h2>Keep the environment explicit</h2><p>MQTT needs a broker and a browser client over WebSockets. WebTorrent needs available WebRTC peers. Media over QUIC needs a protocol implementation and relay. Controlled Frame and Direct Sockets require an installed Isolated Web App.</p><p>Those integration proofs remain separate from a normal HTML tab. See the <a href="../docs/next-proofs.md">roadmap and acceptance tests</a>.</p></section>
+<dialog id="copy-dialog"><form method="dialog"><button>Close</button></form><textarea id="copy-text" rows="12" readonly></textarea></dialog></main>
+<script>
+(() => {
+'use strict';
+const $=id=>document.getElementById(id), show=(text,id='runtime-output')=>$(id).textContent=text;
+const SQL=$('code').value,PYTHON="import math\nreadings = {'phone': 12.5, 'tablet': 18.0, 'desktop': 9.5}\ntotal = sum(readings.values())\n[(device, round(value / total * 100, 1)) for device, value in readings.items()]";
+let worker=null,generation=0,workerURL=null,jobTimer=null,loadedAt=0,activeLanguage=null,runtimeReady=false;
+function cleanup(message='Worker terminated. In-memory results and database were discarded.') {generation++;clearTimeout(jobTimer);worker?.terminate();worker=null;if(workerURL)URL.revokeObjectURL(workerURL);workerURL=null;activeLanguage=null;runtimeReady=false;$('run').disabled=true;for(const id of ['download-db','save-db','restore-db'])$(id).disabled=true;show(message);}
+const workerProgram=async language=>{
+ let db=null,sqlite=null,pyodide=null;
+ const report=(kind,value,extra={})=>postMessage({kind,value,...extra});
+ const start=performance.now();
+ try{
+  if(language==='sqlite'){
+   const base='https://cdn.jsdelivr.net/npm/@sqlite.org/sqlite-wasm@3.53.4-build1/dist/';
+   const init=(await import(base+'index.mjs')).default;sqlite=await init({locateFile:file=>base+file});db=new sqlite.oo1.DB(':memory:','c');
+  }else{
+   const base='https://cdn.jsdelivr.net/pyodide/v0.29.3/full/';importScripts(base+'pyodide.js');pyodide=await loadPyodide({indexURL:base});
+  }
+  report('ready','Runtime ready',{ms:Math.round(performance.now()-start),resources:performance.getEntriesByType('resource').map(e=>({name:e.name,encodedBodySize:e.encodedBodySize,transferSize:e.transferSize}))});
+ }catch(e){report('loaderror',e.message);return;}
+ onmessage=async e=>{const started=performance.now();try{
+  if(e.data.type==='run'){
+   if(language==='sqlite'){
+    let count=0;const rows=[];db.exec({sql:e.data.code,rowMode:'object',callback:row=>{count++;if(count<=100)rows.push(row);}});report('result',rows,{rows:count,ms:Math.round(performance.now()-started)});
+   }else{
+    const lines=[];pyodide.setStdout({batched:text=>{if(lines.length<100)lines.push(text.slice(0,2000));}});const result=await pyodide.runPythonAsync(e.data.code);let text;try{text=String(result??'').slice(0,10000);}finally{result?.destroy?.();}report('result',{stdout:lines,result:text},{ms:Math.round(performance.now()-started)});
+   }
+  }else if(e.data.type==='export'){
+   const data=sqlite.capi.sqlite3_js_db_export(db.pointer);report('database',data,{purpose:e.data.purpose});
+  }else if(e.data.type==='restore'){
+   const data=new Uint8Array(e.data.data);if(data.length>5000000)throw Error('Database limit: 5 MB.');
+   const ptr=sqlite.wasm.allocFromTypedArray(data);
+   const rc=sqlite.capi.sqlite3_deserialize(db.pointer,'main',ptr,data.length,data.length,sqlite.capi.SQLITE_DESERIALIZE_FREEONCLOSE|sqlite.capi.SQLITE_DESERIALIZE_RESIZEABLE);
+   if(rc){sqlite.wasm.dealloc(ptr);throw Error('SQLite rejected the database: '+rc);}
+   report('result','Database restored into memory.');
+  }
+ }catch(e){report('error',e.message);}};
+};
+$('language').onchange=()=>{cleanup('Runtime changed. Load it when ready.');$('code').value=$('language').value==='sqlite'?SQL:PYTHON;};
+$('load').onclick=()=>{cleanup('Downloading runtime and supporting assets…');const token=generation;activeLanguage=$('language').value;loadedAt=performance.now();workerURL=URL.createObjectURL(new Blob(['('+workerProgram.toString()+')('+JSON.stringify(activeLanguage)+')'],{type:'text/javascript'}));worker=new Worker(workerURL);jobTimer=setTimeout(()=>cleanup('Runtime load exceeded 60 seconds. Check the connection and try again.'),60000);
+ worker.onmessage=async e=>{if(token!==generation)return;const m=e.data;clearTimeout(jobTimer);try{
+  if(m.kind==='loaderror'){cleanup(m.value);return;}if(m.kind==='ready'){runtimeReady=true;$('run').disabled=false;for(const id of ['download-db','save-db','restore-db'])$(id).disabled=activeLanguage!=='sqlite';show(JSON.stringify(m,null,2));}
+  else if(m.kind==='database'){
+   const data=new Uint8Array(m.value);if(m.purpose==='download'){const url=URL.createObjectURL(new Blob([data],{type:'application/vnd.sqlite3'}));const a=document.createElement('a');a.href=url;a.download='one-proof.sqlite3';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);show('Exported '+data.length+' database bytes.');}
+   else{if(!navigator.storage?.getDirectory)throw Error('OPFS unavailable. Export the database instead.');const root=await navigator.storage.getDirectory(),file=await root.getFileHandle('one-proof-runtime.sqlite3',{create:true});const output=await file.createWritable();await output.write(data);await output.close();if(token===generation)show('Saved '+data.length+' bytes to one-proof-runtime.sqlite3.');}
+  }else show(JSON.stringify(m,null,2));
+ }catch(err){show(err.message);}finally{if(token===generation)$('run').disabled=!runtimeReady;}};
+ worker.onerror=e=>cleanup('Worker failed: '+e.message);
+};
+function send(data){if(!worker)throw Error('Load a runtime first.');worker.postMessage(data);}
+$('run').onclick=()=>{if($('code').value.length>100000)return show('Code limit: 100,000 characters.');$('run').disabled=true;show('Running in worker…');jobTimer=setTimeout(()=>cleanup('Execution exceeded 20 seconds; the worker was terminated.'),20000);send({type:'run',code:$('code').value});};
+$('stop').onclick=()=>cleanup();$('download-db').onclick=()=>send({type:'export',purpose:'download'});$('save-db').onclick=()=>send({type:'export',purpose:'opfs'});$('restore-db').onclick=async()=>{try{if(!navigator.storage?.getDirectory)throw Error('OPFS unavailable.');const root=await navigator.storage.getDirectory();const handle=await root.getFileHandle('one-proof-runtime.sqlite3');const file=await handle.getFile();if(file.size>5000000)throw Error('Database limit: 5 MB.');send({type:'restore',data:await file.arrayBuffer()});}catch(e){show(e.message);}};
+setInterval(()=>$('clock').value=(performance.now()/1000).toFixed(1)+' s',100);
+let transport=null,transportRun=0;
+function endpoint(){return (location.protocol==='https:'?'wss://':'ws://')+location.host+'/proofs/echo';}$('endpoint').value=location.protocol==='file:'?'':endpoint();
+$('transport-kind').onchange=()=>{$('endpoint').value=$('transport-kind').value==='websocket'?endpoint():'';};
+function cancel(){transportRun++;transport?.close();transport=null;show('Connection canceled.','transport-output');}$('cancel-echo').onclick=cancel;
+$('echo').onclick=async()=>{cancel();const run=transportRun;let timer;const start=performance.now();try{
+ const url=new URL($('endpoint').value),payload=$('payload').value;const raw=new TextEncoder().encode(payload);if(raw.length>16000)throw Error('Payload limit: 16 KB.');let connected=0,received;
+ const work=async()=>{
+  if($('transport-kind').value==='websocket'){
+   if(!['ws:','wss:'].includes(url.protocol))throw Error('Use a ws:// or wss:// endpoint.');
+   const connection=new WebSocket(url);transport=connection;received=await new Promise((resolve,reject)=>{connection.onopen=()=>{if(run!==transportRun){connection.close();return reject(Error('Canceled.'));}connected=performance.now();connection.send(payload);};connection.onmessage=e=>resolve(e.data);connection.onerror=()=>reject(Error('WebSocket connection failed. Is the echo helper running?'));connection.onclose=()=>reject(Error('Connection closed before an echo arrived.'));});
+  }else{
+   if(!window.WebTransport)throw Error('WebTransport unavailable.');if(url.protocol!=='https:')throw Error('WebTransport requires an HTTPS endpoint.');const connection=new WebTransport(url);transport=connection;connection.closed.catch(()=>{});await connection.ready;if(run!==transportRun)throw Error('Canceled.');connected=performance.now();const stream=await connection.createBidirectionalStream(),writer=stream.writable.getWriter(),reader=stream.readable.getReader();await writer.write(raw);await writer.close();const decoder=new TextDecoder();let count=0;received='';while(true){const {value,done}=await reader.read();if(done)break;count+=value.length;if(count>32000)throw Error('Echo exceeds response limit.');received+=decoder.decode(value,{stream:true});}received+=decoder.decode();reader.releaseLock();writer.releaseLock();
+  }
+ };
+ await Promise.race([work(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Connection/echo exceeded 12 seconds.')),12000);})]);if(run!==transportRun)return;if(received!==payload)throw Error('Echo differs from the sent payload.');show(JSON.stringify({result:'PASS',transport:$('transport-kind').value,payloadBytes:raw.length,connectionMs:Math.round(connected-start),roundTripMs:Math.round(performance.now()-connected),totalMs:Math.round(performance.now()-start)},null,2),'transport-output');
+ }catch(e){if(run===transportRun)show(e.message,'transport-output');}finally{clearTimeout(timer);if(run===transportRun){transport?.close();transport=null;}}};
+$('prompt').onclick=async()=>{const text='Use $browser-native-spike to adapt the runtime and transport proofs in '+location.href+'. Source: proofs/runtime.html and proofs/server.py. Keep runtime loading explicit, pin dependencies, run costly code in a worker, implement termination and report cold-load versus execution time. For transport, verify the echoed payload and report connection time separately from round-trip latency. Preserve the existing project conventions.';try{await navigator.clipboard.writeText(text);$('prompt').textContent='Copied';}catch{$('copy-text').value=text;$('copy-dialog').showModal();$('copy-text').focus();$('copy-text').select();}};
+window.addEventListener('pagehide',()=>{cleanup();cancel();});
+})();
+</script></html>
