@@ -3,7 +3,7 @@
 // and the app shell still loads offline after the first visit.
 // Fall back on network errors, server errors, or a 3-second timeout; preserve 4xx responses.
 const PREFIX = 'rich-editor-mvp:' + new URL('./', self.location.href).pathname + ':';
-const CACHE = PREFIX + 'v2';
+const CACHE = PREFIX + 'v3';
 const ASSETS = ['./', './index.html', './sw.js'].map(path => new URL(path, self.location.href).href);
 
 self.addEventListener('install', (event) => {
@@ -20,6 +20,7 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   url.search = '';
+  url.hash = ''; // Section fragments identify UI state, not a different shell asset.
   if (event.request.method !== 'GET' || !ASSETS.includes(url.href)) return;
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);

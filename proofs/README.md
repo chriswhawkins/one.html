@@ -83,6 +83,8 @@ Browser checks ran in Chromium 153 using independent contexts and disposable dat
 | Transport | Native WebSocket echo matches its payload. Server checks reject bad origins, invalid SDP, wrong token roles, reused invitations and hidden-file requests. |
 | Layout | All five surface views and the runtime lab fit a 390 px viewport. This does not establish actual iOS/Android behavior. |
 
+Public deployment checks also cover source links under `/one.html/`, static-helper fallback, and offline reloads with section fragments. Worker asset matching ignores fragments so bookmarked sections use the cached shell.
+
 Artifacts and executable Playwright CLI check scripts live in ignored `output/playwright/`. No package manager or test framework was added to the repository.
 
 Still requiring the corresponding environment: physical iPhone/iPad/Android input and lifecycle tests; actual screen chooser/scroll/zoom tests; cross-network TURN traversal; a real WebTransport/MoQ endpoint; MQTT broker/WebTorrent swarm integration; installed IWA controlled frames and direct sockets. The UI and roadmap distinguish those from verified results.
